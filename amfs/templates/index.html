@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome{% endblock %}
+{% block header %}Automated Marking and Feedback System{% endblock %}
+
+{% block status %}<div></div>{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <label for="title">Create a new marking job</label>
+        <input type="text" name="name" id="name" value="{{ request.form['title'] }}"
+               placeholder="Job name" required>
+        <input type="submit" value="Start" >
+    </form>
+{% endblock %}
