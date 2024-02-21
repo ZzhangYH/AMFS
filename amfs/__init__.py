@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, url_for, redirect, session
 
 
 def create_app(test_config=None):
@@ -30,8 +30,15 @@ def create_app(test_config=None):
         return "Hello, World!"
 
     # index page
-    @app.route('/')
+    @app.route('/', methods=['GET', 'POST'])
     def index():
+        if request.method == 'POST':
+            session['job'] = request.form['name']
+            return redirect(url_for('setup.basics'))
+
         return render_template('index.html')
+
+    from . import setup
+    app.register_blueprint(setup.bp)
 
     return app

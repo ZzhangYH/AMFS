@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Setup Basics{% endblock %}
+{% block header %}{{ session['job'] }}{% endblock %}
+
+{% block status %}
+    <div>
+        <img src="{{ url_for('static', filename='setup/status-bar-1.svg') }}" alt="Status Bar">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <label>Compilation</label>
+        <input type="text" name="cCommand" id="cCommand" value="{{ request.form['cCommand'] }}"
+               placeholder="Compile command" required>
+        <label>Execution</label>
+        <input type="text" name="eCommand" id="eCommand" value="{{ request.form['eCommand'] }}"
+               placeholder="Execute command" required>
+        <label>Time constraints (in seconds)</label>
+        <input type="text" name="timeout" id="timeout" value="{{ request.form['timeout'] }}"
+               placeholder="Timeout" required>
+        <input type="submit" value="Next" >
+    </form>
+{% endblock %}

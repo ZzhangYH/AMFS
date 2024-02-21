@@ -27,7 +27,10 @@ section {
 }
 
 .status div {
-    min-height: 200px;
+    text-align: center;
+    display: block;
+    margin: auto;
+    padding: 1.5rem;
 }
 
 .flash {
@@ -72,4 +75,5 @@ section {
     text-align: center;
     background-color: var(--accent);
     align-self: end;
+    margin-top: 3rem;
 }
