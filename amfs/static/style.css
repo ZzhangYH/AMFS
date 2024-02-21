@@ -3,6 +3,7 @@
     --primary: #4A4A4A;
     --secondary: #CCCCCC;
     --tertiary: #F1F1F1;
+    --error: #E30000
 }
 
 html {
@@ -34,8 +35,13 @@ section {
 }
 
 .flash {
-    border: 1px solid var(--accent);
-    margin: 1rem 0;
+    max-width: 50%;
+    border-radius: 12px;
+    box-sizing: border-box;
+    color: var(--error);
+    border: 1px solid var(--error);
+    background-color: var(--tertiary);
+    margin: 1.5rem auto;
     padding: 1rem;
 }
 
