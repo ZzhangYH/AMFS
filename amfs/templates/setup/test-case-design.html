@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Setup (Test Case Design){% endblock %}
+{% block header %}{{ session['job'] }}{% endblock %}
+
+{% block status %}
+    <div>
+        <img src="{{ url_for('static', filename='setup/status-bar-2.svg') }}" alt="Status Bar">
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if not tests %}
+        <form method="post" enctype="multipart/form-data">
+            <input type="file" id="files" name="files[]" multiple required>
+            <input type="submit" value="Upload">
+        </form>
+    {% else %}
+        <div class="div_header">
+            <label>Total test cases: {{ tests|length }}</label>
+            <label id="total_marks">Total marks: 0</label>
+        </div>
+        <form method="post">
+            <input type="hidden" name="total_tests" value="{{ tests|length }}">
+            {% for test in tests %}
+                <input type="hidden" name="tc_file_{{ loop.index }}" value="{{ test.filename }}">
+                <div class="upload_test_case">
+                    <label>{{ loop.index }}. {{ test.filename }}</label>
+                    <div class="test_case_config">
+                        <input type="text" class="feedback" name="tc_feedback_{{ loop.index }}"
+                               id="tc_feedback_{{ loop.index }}"
+                               placeholder="Feedback for students failing this test" required>
+                        <input type="number" class="mark" name="tc_mark_{{ loop.index }}"
+                               id="tc_mark_{{ loop.index }}"
+                               placeholder="Mark" min="0" step="0.1" required>
+                    </div>
+                </div>
+            {% endfor %}
+            <input type="submit" value="Next">
+        </form>
+
+        {# Inline script to update total marks in real time #}
+        <script>
+            function updateTotalMarks() {
+                let totalMarks = 0;
+                document.querySelectorAll('.mark').forEach(function(input) {
+                    totalMarks += parseFloat(input.value) || 0;
+                });
+                document.getElementById('total_marks').textContent = 'Total marks: ' + totalMarks;
+            }
+            document.querySelectorAll('.mark').forEach(function(input) {
+                input.addEventListener('input', updateTotalMarks);
+            });
+        </script>
+    {% endif %}
+{% endblock %}
