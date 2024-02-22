@@ -10,8 +10,8 @@
 
 {% block content %}
     <form method="post">
-        <label for="title">Create a new marking job</label>
-        <input type="text" name="name" id="name" value="{{ request.form['title'] }}"
+        <label for="job_title">Create a new marking job</label>
+        <input type="text" name="job_title" id="job_title" value="{{ request.form['job_title'] }}"
                placeholder="Job name" required>
         <div class="spacer"></div>
         <div class="divider"></div>

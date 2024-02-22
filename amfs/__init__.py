@@ -33,7 +33,7 @@ def create_app(test_config=None):
     @app.route('/', methods=['GET', 'POST'])
     def index():
         if request.method == 'POST':
-            session['job'] = request.form['name']
+            session['job'] = request.form['job_title']
             return redirect(url_for('setup.basics'))
 
         return render_template('index.html')
