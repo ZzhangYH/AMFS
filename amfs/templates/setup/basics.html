@@ -20,6 +20,11 @@
         <label for="timeout">Time constraints (in seconds)</label>
         <input type="text" name="timeout" id="timeout" value="{{ request.form['timeout'] }}"
                placeholder="Timeout" required>
-        <input type="submit" value="Next" >
+        <div class="spacer"></div>
+        <div class="divider"></div>
+        <div class="form-footer">
+            <button type="button" onclick="window.history.back()">Back</button>
+            <input type="submit" value="Next">
+        </div>
     </form>
 {% endblock %}

@@ -13,18 +13,23 @@
     {% if not tests %}
         <form method="post" enctype="multipart/form-data">
             <input type="file" id="files" name="files[]" multiple required>
-            <input type="submit" value="Upload">
+            <div class="spacer"></div>
+            <div class="divider"></div>
+            <div class="form-footer">
+                <button type="button" onclick="window.history.back()">Back</button>
+                <input type="submit" value="Upload">
+            </div>
         </form>
     {% else %}
-        <div class="div_header">
-            <label>Total test cases: {{ tests|length }}</label>
-            <label id="total_marks">Total marks: 0</label>
-        </div>
         <form method="post">
+            <div class="form-header">
+                <label>Total test cases: {{ tests|length }}</label>
+                <label id="total_marks">Total marks: 0</label>
+            </div>
             <input type="hidden" name="total_tests" value="{{ tests|length }}">
             {% for test in tests %}
                 <input type="hidden" name="tc_file_{{ loop.index }}" value="{{ test.filename }}">
-                <div class="upload_test_case">
+                <div class="upload-test-case">
                     <label>{{ loop.index }}. {{ test.filename }}</label>
                     <div class="test_case_config">
                         <input type="text" class="feedback" name="tc_feedback_{{ loop.index }}"
@@ -36,7 +41,12 @@
                     </div>
                 </div>
             {% endfor %}
-            <input type="submit" value="Next">
+            <div class="spacer"></div>
+            <div class="divider"></div>
+            <div class="form-footer">
+                <button type="button" onclick="window.history.back()">Back</button>
+                <input type="submit" value="Next">
+            </div>
         </form>
 
         {# Inline script to update total marks in real time #}

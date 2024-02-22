@@ -45,17 +45,49 @@ section {
     padding: 1rem;
 }
 
-.div_header {
+.form-header, .form-footer {
     display: flex;
     justify-content: space-between;
+    margin: 1rem 0 1rem 0;
 }
 
-.div_header label:first-child {
+.form-header label:first-child {
+    font-size: larger;
     align-self: flex-start;
 }
 
-.div_header label:last-child {
+.form-header label:last-child {
+    font-size: larger;
     align-self: flex-end;
+}
+
+.form-footer button:first-child {
+    align-self: flex-start;
+}
+
+.form-footer input[type=submit]:last-child {
+    align-self: flex-end;
+}
+
+.spacer {
+    height: 20px;
+}
+
+.divider {
+    border-bottom: 1px solid var(--secondary);
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.content button {
+    cursor: pointer;
+    width: 100px;
+    height: 2.5rem;
+    border-radius: 10px;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+    font-size: medium;
+    text-align: center;
+    background-color: transparent;
 }
 
 .content form {
@@ -73,6 +105,7 @@ section {
     height: 3rem;
     border-radius: 12px;
     box-sizing: border-box;
+    font-size: medium;
     margin-bottom: 1rem;
     padding: 0 1rem 0 1rem;
 }
@@ -80,7 +113,6 @@ section {
 .content input[type=text], input[type=number], .content textarea {
     border: 1px solid var(--secondary);
     color: var(--primary);
-    font-size: medium;
     text-align: start;
     resize: vertical;
 }
@@ -88,42 +120,41 @@ section {
 .content input[type=submit] {
     cursor: pointer;
     width: 100px;
+    height: 2.5rem;
+    border-radius: 10px;
     border: none;
     color: white;
-    font-size: medium;
     text-align: center;
     background-color: var(--accent);
-    align-self: end;
-    margin-top: 3rem;
 }
 
 .content input[type=file] {
-    height: auto;
     align-self: center;
 }
 
 .content input[type=file]::file-selector-button {
+    height: 3rem;
     border-radius: 8px;
     border: none;
     color: var(--primary);
     background: var(--tertiary);
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
-.upload_test_case {
+.upload-test-case {
     border-radius: 8px;
     background-color: var(--tertiary);
     padding: 1rem 2rem 1rem 2rem;
-    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
-.upload_test_case .feedback {
+.upload-test-case .feedback {
     width: 80%;
     margin: 0.5rem 0 0.25rem 0;
 }
 
-.upload_test_case .mark {
+.upload-test-case .mark {
     width: 10%;
     margin: 0.5rem 0 0.25rem 0;
 }
