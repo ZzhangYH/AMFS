@@ -38,6 +38,9 @@ def create_app(test_config=None):
 
         return render_template('index.html')
 
+    from .database import db
+    db.init_app(app)
+
     from . import setup
     app.register_blueprint(setup.bp)
 
