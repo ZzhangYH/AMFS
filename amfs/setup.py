@@ -20,8 +20,8 @@ def basics():
         compile_command = request.form['cCommand']
         execute_command = request.form['eCommand']
         timeout = request.form['timeout']
-
         error = None
+
         try:
             timeout = int(timeout)
             if timeout <= 0:
@@ -69,15 +69,13 @@ def test_case_design():
                     db.execute("""
                         INSERT INTO TestCase (tc_id, tc_name, tc_mark, tc_input)
                         VALUES (?, ?, ?, ?)
-                    """, (i, os.path.splitext(os.path.basename(filename))[0], mark, f.read()), )
+                    """, (i, os.path.splitext(os.path.basename(filename))[0], mark, f.read()))
                     # Insert feedback entries
                     db.execute("INSERT INTO Feedback (fb_id, fb_content) VALUES (?, ?)",
-                               (i, feedback),)
+                               (i, feedback))
                     # Update 1-1 feedback selection
                     db.execute("INSERT INTO FeedbackSelection (fb_id, tc_id) VALUES (?, ?)",
-                               (i, i),)
-                    # Batch commit all changes
-                    db.commit()
+                               (i, i))
 
                 # Remove temporarily saved test files
                 try:
@@ -85,6 +83,57 @@ def test_case_design():
                 except FileNotFoundError:
                     pass
 
-            return "Check database!"
+            # Batch commit all changes
+            db.commit()
+            return redirect(url_for('setup.additional_settings'))
 
     return render_template('setup/test-case-design.html', tests=tests)
+
+
+@bp.route('/additional-settings', methods=['GET', 'POST'])
+def additional_settings():
+    if session.get('job') is None:
+        return redirect(url_for('index'))
+
+    db = get_db()
+    tests = db.execute("SELECT * FROM TestCase").fetchall()
+
+    if request.method == 'POST':
+        selected_tests = request.form.getlist('tests')
+        error = None
+
+        if len(selected_tests) < 2:
+            error = "Please select at least two tests as a combination."
+
+        if error is not None:
+            flash(error)
+        else:
+            # Check if the combination already exists
+            new_combination = set(selected_tests)
+            feedbacks = db.execute("""
+                SELECT GROUP_CONCAT(tc_id) AS tc_group
+                FROM FeedbackSelection
+                GROUP BY fb_id
+            """).fetchall()
+            for feedback in feedbacks:
+                old_combination = set(feedback['tc_group'].split(','))
+                if old_combination == new_combination:
+                    error = "This combination already exists."
+                    break
+
+            if error is not None:
+                flash(error)
+            else:
+                # Insert additional feedback at the end of Feedback and get its id
+                db.execute("INSERT INTO Feedback (fb_content) VALUES (?)",
+                           (request.form['feedback'],))
+                db.commit()
+                fb_id = db.execute("SELECT fb_id FROM Feedback ORDER BY fb_id DESC").fetchone()[0]
+
+                # Connecting the feedback with the new combination
+                for tc_id in selected_tests:
+                    db.execute("INSERT INTO FeedbackSelection (fb_id, tc_id) VALUES (?, ?)",
+                               (fb_id, tc_id))
+                db.commit()
+
+    return render_template('setup/additional-settings.html', tests=tests)

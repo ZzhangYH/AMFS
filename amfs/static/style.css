@@ -3,7 +3,10 @@
     --primary: #4A4A4A;
     --secondary: #CCCCCC;
     --tertiary: #F1F1F1;
-    --error: #E30000
+    --error: #E30000;
+    --normal-radius: 6px;
+    --input-radius: 12px;
+    --checkbox-radius: 3px;
 }
 
 html {
@@ -36,7 +39,7 @@ section {
 
 .flash {
     max-width: 50%;
-    border-radius: 12px;
+    border-radius: var(--normal-radius);
     box-sizing: border-box;
     color: var(--error);
     border: 1px solid var(--error);
@@ -78,11 +81,11 @@ section {
     margin: 0.5rem 0 0.5rem 0;
 }
 
-.content button {
+button {
     cursor: pointer;
     width: 100px;
     height: 2.5rem;
-    border-radius: 10px;
+    border-radius: var(--normal-radius);
     border: 2px solid var(--accent);
     color: var(--accent);
     font-size: medium;
@@ -90,51 +93,81 @@ section {
     background-color: transparent;
 }
 
-.content form {
+form {
     display: flex;
     flex-direction: column;
 }
 
-.content label {
+label {
     font-size: large;
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
 
-.content input {
+.table {
+    border: 1px solid var(--secondary);
+    border-radius: var(--input-radius);
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tr:nth-child(even) {
+    background-color: var(--tertiary);
+}
+
+td {
+    padding: 0.75rem 1rem 0.75rem 1rem;
+}
+
+table label {
+    font-size: medium;
+    font-weight: normal;
+    padding: 0;
+    margin: 0;
+}
+
+input {
     height: 3rem;
-    border-radius: 12px;
+    border-radius: var(--input-radius);
     box-sizing: border-box;
     font-size: medium;
     margin-bottom: 1rem;
     padding: 0 1rem 0 1rem;
 }
 
-.content input[type=text], input[type=number], .content textarea {
+input[type=text], input[type=number], .content textarea {
     border: 1px solid var(--secondary);
     color: var(--primary);
     text-align: start;
     resize: vertical;
 }
 
-.content input[type=submit] {
+input[type=submit], input[type=button] {
     cursor: pointer;
-    width: 100px;
+    width: fit-content;
+    min-width: 100px;
     height: 2.5rem;
-    border-radius: 10px;
+    display: inline-block;
+    border-radius: var(--normal-radius);
     border: none;
     color: white;
     text-align: center;
     background-color: var(--accent);
+    padding: 0 2rem 0 2rem;
 }
 
-.content input[type=file] {
+input[type=file] {
     align-self: center;
 }
 
-.content input[type=file]::file-selector-button {
+input[type=file]::file-selector-button {
     height: 3rem;
-    border-radius: 8px;
+    border-radius: var(--input-radius);
     border: none;
     color: var(--primary);
     background: var(--tertiary);
@@ -142,8 +175,62 @@ section {
     padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
+input[type="checkbox"] {
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 0.9rem;
+    height: 0.9rem;
+    margin: 0;
+    position: relative;
+}
+
+input[type=checkbox]:before {
+    cursor: pointer;
+    content: "";
+    display: block;
+    border-radius: var(--checkbox-radius);
+    border: 1px solid var(--secondary);
+    position: absolute;
+    width: 0.9rem;
+    height: 0.9rem;
+    top: 0;
+    left: 0;
+    background-color: white;
+}
+
+input[type=checkbox]:checked:before {
+    cursor: pointer;
+    content: "";
+    display: block;
+    border-radius: var(--checkbox-radius);
+    border: 1px solid var(--accent);
+    position: absolute;
+    width: 0.9rem;
+    height: 0.9rem;
+    top: 0;
+    left: 0;
+    background-color: var(--accent);
+}
+
+input[type=checkbox]:checked:after {
+    cursor: pointer;
+    content: "";
+    display: block;
+    width: 3px;
+    height: 8px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(45deg);
+    -ms-transform: rotate(45deg);
+    transform: rotate(45deg);
+    position: absolute;
+    top: 2px;
+    left: 6px;
+}
+
 .upload-test-case {
-    border-radius: 8px;
+    border-radius: var(--normal-radius);
     background-color: var(--tertiary);
     padding: 1rem 2rem 1rem 2rem;
     margin-bottom: 1rem;

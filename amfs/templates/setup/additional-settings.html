@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Setup (Additional Settings){% endblock %}
+{% block header %}{{ session['job'] }}{% endblock %}
+
+{% block status %}
+    <div>
+        <img src="{{ url_for('static', filename='setup/status-bar-3.svg') }}" alt="Status Bar">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <label>Select test case combination</label>
+        <div class="table">
+            <table id="test_case_list">
+                <tbody>
+                {% for test in tests %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="tests" id="test_{{ loop.index }}"
+                                   value="{{ loop.index }}">
+                            <label class="normal" for="test_{{ loop.index }}">
+                                {{ test['tc_name'] }}
+                            </label>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <label for="feedback">Additional feedback message</label>
+        <input type="text" name="feedback" id="feedback"
+               placeholder="Feedback for students failing this test combination" required>
+        <input type="submit" value="Submit combination" style="align-self: center">
+        <div class="spacer"></div>
+        <div class="divider"></div>
+        <div class="form-footer">
+            <button type="button" onclick="window.history.back()">Back</button>
+            <input type="button" value="Next">
+        </div>
+    </form>
+{% endblock %}
