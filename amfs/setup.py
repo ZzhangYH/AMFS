@@ -7,6 +7,7 @@ from flask import (
 )
 
 from amfs.database.db import get_db
+from amfs.marking import AutoMarking
 
 bp = Blueprint('setup', __name__, url_prefix='/setup')
 
@@ -20,19 +21,17 @@ def basics():
         compile_command = request.form['cCommand']
         execute_command = request.form['eCommand']
         timeout = request.form['timeout']
-        error = None
+        solution_dir = request.form['solutionDir']
+        submission_dir = request.form['submissionDir']
 
-        try:
-            timeout = int(timeout)
-            if timeout <= 0:
-                error = "Timeout should be greater than 0."
-        except ValueError:
-            error = "Timeout should be an integer."
+        error = AutoMarking.check_configs(compile_command, timeout, solution_dir, submission_dir)
 
         if error is None:
             session['compile_command'] = compile_command
             session['execute_command'] = execute_command
             session['timeout'] = timeout
+            session['solution_dir'] = solution_dir
+            session['submission_dir'] = submission_dir
             return redirect(url_for('setup.test_case_design'))
 
         flash(error)

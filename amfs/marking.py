@@ -32,35 +32,53 @@ class Attempt:
 
 class AutoMarking:
     def __init__(
-        self,
-        compile_command: str,
-        execute_command: str,
-        timeout: int
+            self,
+            compile_command: str,
+            execute_command: str,
+            timeout: int,
+            tests: [TestCase],
+            solution_dir: str,
+            submission_dir: str,
     ):
         self.compile_command = compile_command
         self.execute_command = execute_command
         self.timeout = timeout
-        self.tests = None
-        self.solution_dir = None
-        self.submission_dir = None
-        self.submissions = None
-
-    def load_tests(self, tests: [TestCase]) -> str | None:
-        if len(tests) == 0:
-            return "No test case found."
-        else:
-            self.tests = tests
-            return None
-
-    def load_directories(self, solution_dir: str, submission_dir: str) -> str | None:
+        self.tests = tests
         self.solution_dir = Path(solution_dir)
         self.submission_dir = Path(submission_dir)
         self.submissions = [d for d in os.listdir(self.submission_dir)
                             if os.path.isdir(self.submission_dir / d)]
-        if self.submissions is None or len(self.submissions) == 0:
+
+    @staticmethod
+    def check_configs(
+            compile_command: str,
+            timeout: str,
+            solution_dir: str,
+            submission_dir: str
+    ) -> str | None:
+        try:
+            if int(timeout) <= 0:
+                return "Timeout should be greater than 0."
+        except ValueError:
+            return "Timeout should be an integer."
+
+        solution_dir = Path(solution_dir)
+        submission_dir = Path(submission_dir)
+        if not solution_dir.is_dir():
+            return f"No such directory {solution_dir}."
+        if not submission_dir.is_dir():
+            return f"No such directory {submission_dir}."
+
+        try:
+            subprocess.run(compile_command, shell=True, cwd=solution_dir)
+        except subprocess.CalledProcessError:
+            return "Failed to compile solution."
+
+        submissions = [d for d in os.listdir(submission_dir) if os.path.isdir(submission_dir / d)]
+        if not submissions or len(submissions) == 0:
             return "No submission found."
-        else:
-            return None
+
+        return None
 
     def get_solutions(self) -> str | None:
         try:
@@ -153,11 +171,6 @@ class AutoMarking:
 
 # Test the marking process is working
 def main():
-    marking = AutoMarking(
-        compile_command="javac -encoding UTF-8 -sourcepath . IdSum.java",
-        execute_command="java -Dfile.encoding=UTF-8 -XX:+UseSerialGC -Xss64m -Xms1920m -Xmx1920m IdSum",
-        timeout=1
-    )
     with open(Path(os.getcwd()) / "../tests/marking/test_case/1.in") as f1:
         test1 = TestCase(
             id=1,
@@ -170,8 +183,11 @@ def main():
             name="test2",
             input=f2.read()
         )
-    marking.load_tests([test1, test2])
-    marking.load_directories(
+    marking = AutoMarking(
+        compile_command="javac -encoding UTF-8 -sourcepath . IdSum.java",
+        execute_command="java -Dfile.encoding=UTF-8 -XX:+UseSerialGC -Xss64m -Xms1920m -Xmx1920m IdSum",
+        timeout=1,
+        tests=[test1, test2],
         solution_dir=os.path.join(os.getcwd(), "../tests/marking/solution"),
         submission_dir=os.path.join(os.getcwd(), "../tests/marking/submission")
     )
