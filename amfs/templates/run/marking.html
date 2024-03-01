@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Marking{% endblock %}
+{% block header %}{{ session['job'] }}{% endblock %}
+
+{% block status %}
+    <div>
+        <img src="{{ url_for('static', filename='svg/status-bar-4.svg') }}" alt="Status Bar">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <div class="form-header">
+            <label>Marking job checklist</label>
+        </div>
+        <div class="symbol-label">
+            <img src="{{ url_for('static', filename='svg/symbol-gear.svg') }}"
+                 alt="Gear symbol for marking configurations">
+            <label>Marking configurations</label>
+            <label>Completed</label>
+        </div>
+        <div class="symbol-label">
+            <img src="{{ url_for('static', filename='svg/symbol-list.number.svg') }}"
+                 alt="List symbol for test cases input and mark">
+            <label>Test cases input and mark</label>
+            <label>{{ overview['tc_count'] }} pieces</label>
+        </div>
+        <div class="symbol-label">
+            <img src="{{ url_for('static', filename='svg/symbol-text.bubble.svg') }}"
+                 alt="Bubble symbol for feedback messages">
+            <label>Feedback messages</label>
+            <label>{{ overview['fb_count'] }} pieces</label>
+        </div>
+        <div class="spacer"></div>
+        <input type="submit" value="Start marking" style="align-self: center">
+    </form>
+{% endblock %}

@@ -18,7 +18,7 @@ class MarkingConfig:
 class TestCase:
     id: int
     name: str
-    input: str = None
+    input: str
     solution: str = None
 
 
