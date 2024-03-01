@@ -12,12 +12,14 @@
 {% block content %}
     {% if not tests %}
         <form method="post" enctype="multipart/form-data">
+            <div class="spacer"></div>
+            <label for="files">Upload test case inputs as files</label>
             <input type="file" id="files" name="files[]" multiple required>
             <div class="spacer"></div>
             <div class="divider"></div>
             <div class="form-footer">
                 <button type="button" onclick="window.history.back()">Back</button>
-                <input type="submit" value="Upload">
+                <input type="submit" value="Next">
             </div>
         </form>
     {% else %}

@@ -34,7 +34,7 @@ section {
     text-align: center;
     display: block;
     margin: auto;
-    padding: 1.5rem;
+    padding: 1.5rem 0 0.5rem 0;
 }
 
 .flash {
@@ -44,7 +44,7 @@ section {
     color: var(--error);
     border: 1px solid var(--error);
     background-color: var(--tertiary);
-    margin: 1.5rem auto;
+    margin: 1rem auto;
     padding: 1rem;
 }
 
@@ -86,7 +86,7 @@ button {
     width: 100px;
     height: 2.5rem;
     border-radius: var(--normal-radius);
-    border: 2px solid var(--accent);
+    border: 1px solid var(--accent);
     color: var(--accent);
     font-size: medium;
     text-align: center;
@@ -162,17 +162,20 @@ input[type=submit], input[type=button] {
 }
 
 input[type=file] {
-    align-self: center;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--secondary);
+    padding: 1rem;
 }
 
 input[type=file]::file-selector-button {
-    height: 3rem;
-    border-radius: var(--input-radius);
+    cursor: pointer;
+    height: 2.5rem;
+    border-radius: var(--normal-radius);
     border: none;
     color: var(--primary);
     background: var(--tertiary);
-    cursor: pointer;
-    padding: 0.5rem 1rem 0.5rem 1rem;
+    padding: 0 2rem 0 2rem;
 }
 
 input[type="checkbox"] {
@@ -242,6 +245,6 @@ input[type=checkbox]:checked:after {
 }
 
 .upload-test-case .mark {
-    width: 10%;
+    width: 15%;
     margin: 0.5rem 0 0.25rem 0;
 }

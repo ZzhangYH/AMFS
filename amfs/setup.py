@@ -1,12 +1,14 @@
+import dataclasses
+import json
 import os
 import tempfile
 from pathlib import Path
 
 from flask import (
-    Blueprint, redirect, render_template, request, session, url_for, flash
+    Blueprint, redirect, render_template, request, session, url_for, flash, current_app
 )
 
-from amfs.database.db import get_db
+from amfs.database.db import get_db, init_db
 from amfs.marking import AutoMarking
 
 bp = Blueprint('setup', __name__, url_prefix='/setup')
@@ -55,8 +57,10 @@ def test_case_design():
                 test.save(temp_file_dir / test.filename)
 
         elif 'total_tests' in request.form:
-            db = get_db()
             total_tests = int(request.form['total_tests'])
+            with current_app.app_context():
+                init_db()
+            db = get_db()
 
             for i in range(1, total_tests + 1):
                 filename = request.form.get(f"tc_file_{i}")
@@ -75,12 +79,6 @@ def test_case_design():
                     # Update 1-1 feedback selection
                     db.execute("INSERT INTO FeedbackSelection (fb_id, tc_id) VALUES (?, ?)",
                                (i, i))
-
-                # Remove temporarily saved test files
-                try:
-                    os.remove(temp_file_dir / filename)
-                except FileNotFoundError:
-                    pass
 
             # Batch commit all changes
             db.commit()
