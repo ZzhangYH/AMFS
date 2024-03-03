@@ -20,7 +20,7 @@ CREATE TABLE Attempt (
     at_id INTEGER PRIMARY KEY AUTOINCREMENT,
     at_code INTEGER NOT NULL,
     at_mark FLOAT NOT NULL,
-    at_time TIMESTAMP NOT NULL,
+    at_output VARCHAR NOT NULL,
     sm_id VARCHAR NOT NULL,
     tc_id INTEGER NOT NULL,
     FOREIGN KEY (sm_id) REFERENCES Submission (sm_id),

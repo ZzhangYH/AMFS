@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Feedback{% endblock %}
+{% block header %}{{ session['job'] }}{% endblock %}
+
+{% block status %}
+    <div>
+        <img src="{{ url_for('static', filename='svg/status-bar-5.svg') }}" alt="Status Bar">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <div class="form-header">
+            <label>Feedback report overview</label>
+        </div>
+        <div class="table">
+            <table>
+            <thead>
+            <tr>
+                <th><label>Submission ID</label></th>
+                <th><label>Mark</label></th>
+                <th><label>Remark</label></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for submission in submissions %}
+                <tr>
+                    <td><label>{{ submission['sm_id'] }}</label></td>
+                    <td><label>{{ submission['sm_mark'] }} / {{ full_mark }}</label></td>
+                    <td><label></label></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
+        <input type="submit" value="Export to PDF" style="align-self: center">
+    </form>
+{% endblock %}
