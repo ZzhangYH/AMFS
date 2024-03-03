@@ -68,8 +68,13 @@ section {
     align-self: flex-start;
 }
 
-.form-footer input[type=submit]:last-child {
+.form-footer button:last-child input[type=submit]:last-child {
     align-self: flex-end;
+}
+
+#centered-div input[type=submit] {
+    margin: auto;
+    width: fit-content;
 }
 
 .spacer {
@@ -167,7 +172,7 @@ input[type=file] {
     width: 100%;
     height: auto;
     border: 1px solid var(--secondary);
-    padding: 1rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
 input[type=file]::file-selector-button {
