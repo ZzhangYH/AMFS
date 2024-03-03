@@ -5,12 +5,12 @@
 
 {% block status %}
     <div>
-        <img src="{{ url_for('static', filename='setup/status-bar-1.svg') }}" alt="Status Bar">
+        <img src="{{ url_for('static', filename='svg/status-bar-1.svg') }}" alt="Status Bar">
     </div>
 {% endblock %}
 
 {% block content %}
-    <form method="post" enctype="multipart/form-data">
+    <form method="post">
         <label for="cCommand">Compilation</label>
         <input type="text" name="cCommand" id="cCommand" value="{{ request.form['cCommand'] }}"
                placeholder="Compile command" required>

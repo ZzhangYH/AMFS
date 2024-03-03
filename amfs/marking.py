@@ -18,15 +18,17 @@ class MarkingConfig:
 class TestCase:
     id: int
     name: str
-    input: str = None
+    mark: float
+    input: str
     solution: str = None
 
 
 @dataclass
 class Attempt:
-    sm_ID: str
-    tc_ID: int
+    sm_id: str
+    tc_id: int
     code: int   # 0: PASS, 1: COMPILE_ERROR, 2: RUNTIME_ERROR, 3: TIMEOUT, 4: INCORRECT_OUTPUT
+    mark: float
     output: str
 
 
@@ -121,9 +123,10 @@ class AutoMarking:
             error = e.stderr
 
         return Attempt(
-            sm_ID=submission,
-            tc_ID=0,
+            sm_id=submission,
+            tc_id=0,
             code=0 if error is None else 1,
+            mark=0,
             output="Compile success." if error is None else "Compile failed.\n" + error
         )
 
@@ -150,13 +153,15 @@ class AutoMarking:
             output = e.output.decode('utf-8') + "\nTimeout expired."
 
         return Attempt(
-            sm_ID=submission,
-            tc_ID=test.id,
+            sm_id=submission,
+            tc_id=test.id,
             code=code,
+            mark=test.mark if code == 0 else 0,
             output=output
         )
 
     def run(self) -> [Attempt]:
+        self.get_solutions()
         attempts = []
         for submission in self.submissions:
             print(f"Marking student submission: [{submission}].")
@@ -175,12 +180,14 @@ def main():
         test1 = TestCase(
             id=1,
             name="test1",
+            mark=1,
             input=f1.read()
         )
     with open(Path(os.getcwd()) / "../tests/marking/test_case/2.in") as f2:
         test2 = TestCase(
             id=2,
             name="test2",
+            mark=2,
             input=f2.read()
         )
     marking = AutoMarking(
@@ -191,12 +198,11 @@ def main():
         solution_dir=os.path.join(os.getcwd(), "../tests/marking/solution"),
         submission_dir=os.path.join(os.getcwd(), "../tests/marking/submission")
     )
-    marking.get_solutions()
     attempts = marking.run()
 
     print("\nDetailed attempts are listed as follows:")
     for attempt in attempts:
-        print(f"sm_ID: {attempt.sm_ID}, tc_ID: {attempt.tc_ID}, code: {attempt.code}, output: {attempt.output}")
+        print(f"sm_ID: {attempt.sm_id}, tc_ID: {attempt.tc_id}, code: {attempt.code}, output: {attempt.output}")
 
 
 if __name__ == '__main__':

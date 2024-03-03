@@ -51,7 +51,7 @@ section {
 .form-header, .form-footer {
     display: flex;
     justify-content: space-between;
-    margin: 1rem 0 1rem 0;
+    margin: 1rem 0 0.5rem 0;
 }
 
 .form-header label:first-child {
@@ -68,8 +68,13 @@ section {
     align-self: flex-start;
 }
 
-.form-footer input[type=submit]:last-child {
+.form-footer button:last-child input[type=submit]:last-child {
     align-self: flex-end;
+}
+
+#centered-div input[type=submit] {
+    margin: auto;
+    width: fit-content;
 }
 
 .spacer {
@@ -99,7 +104,6 @@ form {
 }
 
 label {
-    font-size: large;
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
@@ -120,15 +124,18 @@ tr:nth-child(even) {
     background-color: var(--tertiary);
 }
 
+th {
+    text-align: start;
+    border-bottom: 1px solid var(--secondary);
+    padding: 0.75rem 1rem 0.75rem 1rem;
+}
+
 td {
     padding: 0.75rem 1rem 0.75rem 1rem;
 }
 
-table label {
-    font-size: medium;
+td label {
     font-weight: normal;
-    padding: 0;
-    margin: 0;
 }
 
 input {
@@ -165,7 +172,7 @@ input[type=file] {
     width: 100%;
     height: auto;
     border: 1px solid var(--secondary);
-    padding: 1rem;
+    padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
 input[type=file]::file-selector-button {
@@ -247,4 +254,32 @@ input[type=checkbox]:checked:after {
 .upload-test-case .mark {
     width: 15%;
     margin: 0.5rem 0 0.25rem 0;
+}
+
+.symbol-label {
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    border-radius: var(--input-radius);
+    border: 1px solid var(--secondary);
+    align-self: center;
+    margin-bottom: 1rem;
+}
+
+.symbol-label img {
+    padding: 0.75rem;
+}
+
+.symbol-label label {
+    height: 3rem;
+    line-height: 3rem;
+    width: 100%;
+    font-size: medium;
+    font-weight: normal;
+}
+
+.symbol-label label:last-child {
+    text-align: end;
+    color: var(--accent);
+    margin-right: 1rem;
 }

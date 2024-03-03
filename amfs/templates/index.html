@@ -10,11 +10,16 @@
 
 {% block content %}
     <form method="post">
-        <label for="job_title">Create a new marking job</label>
+        <div class="form-header">
+            <label>Welcome to AFMS!</label>
+        </div>
+        <label for="job_title">Create a new marking job here</label>
         <input type="text" name="job_title" id="job_title" value="{{ request.form['job_title'] }}"
                placeholder="Job name" required>
         <div class="spacer"></div>
         <div class="divider"></div>
-        <input type="submit" value="Start" style="align-self: flex-end; margin: 1rem 0 1rem 0;">
+        <div class="form-footer" id="centered-div">
+            <input type="submit" value="Start">
+        </div>
     </form>
 {% endblock %}
