@@ -19,7 +19,7 @@ class TestCase:
     id: int
     name: str
     mark: float
-    input: str
+    input: str = None
     solution: str = None
 
 
