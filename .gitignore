@@ -126,3 +126,6 @@ dmypy.json
 
 # Java
 *.class
+
+# Generated directories
+tests/*/**/feedback
