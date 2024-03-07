@@ -29,6 +29,7 @@
 
 {% for attempt in submission['attempts'] %}
 ### {{ attempt['name'] }}
+
 _**{{ attempt['code'] }}**_
 ```
 {{ attempt['output'] }}

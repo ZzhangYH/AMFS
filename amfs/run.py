@@ -1,5 +1,9 @@
+import os
+import platform
+from pathlib import Path
+
 from flask import (
-    Blueprint, redirect, render_template, request, session, url_for, current_app
+    Blueprint, redirect, render_template, request, session, url_for, current_app, flash
 )
 
 from amfs.database.db import get_db
@@ -115,5 +119,22 @@ def feedback():
     db = get_db()
     full_mark = db.execute("SELECT SUM(tc_mark) FROM TestCase").fetchone()[0]
     submissions = db.execute("SELECT * FROM Submission").fetchall()
+
+    if request.method == 'POST':
+        system = platform.system()
+        path = Path(session['submission_dir']) / "feedback"
+        error = None
+
+        if system == 'Windows':
+            os.system(f'explorer "{path}"')
+        elif system == 'Darwin':  # macOS
+            os.system(f'open "{path}"')
+        elif system == 'Linux':
+            os.system(f'xdg-open "{path}"')
+        else:
+            error = "Unsupported operating system."
+
+        if error is not None:
+            flash(error)
 
     return render_template('run/feedback.html', submissions=submissions, full_mark=full_mark)
