@@ -23,6 +23,7 @@ class FeedbackReport:
             self,
             name: str,
             full_mark: float,
+            template_dir: str,
             submission_dir: str,
             submissions: [Submission],
             tests: [TestCase],
@@ -31,6 +32,7 @@ class FeedbackReport:
     ):
         self.name = name
         self.full_mark = full_mark
+        self.template_dir = Path(template_dir)
         self.submission_dir = Path(submission_dir)
         self.submissions = submissions
         self.tests = tests
@@ -61,7 +63,7 @@ class FeedbackReport:
             temp: set[frozenset[int]] = set()
             discarded: set[frozenset[int]] = set()
             for combination in self.feedback_selection:
-                if combination < submission.failed_tests:
+                if combination <= submission.failed_tests:
                     temp.add(combination)
                     if len(combination) > 1:
                         discarded |= overridden_tests(combination)
@@ -96,7 +98,7 @@ class FeedbackReport:
                 } for attempt in submission.attempts]
             }
 
-            with open(Path("./templates") / "feedback.md", 'r') as f:
+            with open(self.template_dir / "feedback.md", 'r') as f:
                 template = Template(f.read(), trim_blocks=True)
                 content = template.render(report=report, submission=sm_dict)
             with open(self.submission_dir / "feedback" / (submission.id + ".md"), 'w') as f:
@@ -107,7 +109,7 @@ class FeedbackReport:
         self.render_report()
 
 
-def overridden_tests(tests: set[int]) -> set[frozenset[int]]:
+def overridden_tests(tests: frozenset[int]) -> set[frozenset[int]]:
     result = set()
     for r in range(1, len(tests)):
         for combination in combinations(tests, r):
@@ -206,6 +208,7 @@ def main():
     fr = FeedbackReport(
         name="Sample",
         full_mark=3,
+        template_dir="templates",
         submission_dir=os.path.join(os.getcwd(), "../tests/marking/submission"),
         submissions=submissions,
         tests=tests,
