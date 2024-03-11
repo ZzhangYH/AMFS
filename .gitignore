@@ -129,3 +129,4 @@ dmypy.json
 
 # Generated directories
 tests/*/**/feedback
+tests/*/**/plagiarism.html
