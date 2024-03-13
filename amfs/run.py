@@ -9,6 +9,7 @@ from flask import (
 from amfs.database.db import get_db
 from amfs.feedback import Submission, FeedbackReport
 from amfs.marking import AutoMarking, TestCase, Attempt
+from amfs.plagiarism import PlagDetection
 
 bp = Blueprint('run', __name__)
 
@@ -58,7 +59,7 @@ def marking():
         db.commit()
 
         # Full mark of the marking job
-        full_mark = db.execute("SELECT SUM(tc_mark) FROM TestCase").fetchone()[0]
+        session['full_mark'] = db.execute("SELECT SUM(tc_mark) FROM TestCase").fetchone()[0]
 
         # List of all submissions
         submissions: list[Submission] = []
@@ -97,9 +98,10 @@ def marking():
             feedback_selection.append(frozenset(tc_combination))
             feedbacks.append(fb_row['fb_content'])
 
+        # Feedback instance
         fr = FeedbackReport(
             name=session['job'],
-            full_mark=full_mark,
+            full_mark=session['full_mark'],
             template_dir=current_app.name + "/" + current_app.template_folder,
             submission_dir=session['submission_dir'],
             submissions=submissions,
@@ -109,6 +111,14 @@ def marking():
         )
         fr.run()
 
+        # Plagiarism instance
+        pd = PlagDetection(
+            language="java",
+            submission_dir=session['submission_dir'],
+            ignore_limit=200
+        )
+        session['plagiarism'] = pd.run()
+
         return redirect(url_for('run.feedback'))
 
     return render_template('run/marking.html', overview=overview)
@@ -117,7 +127,6 @@ def marking():
 @bp.route('/feedback', methods=['GET', 'POST'])
 def feedback():
     db = get_db()
-    full_mark = db.execute("SELECT SUM(tc_mark) FROM TestCase").fetchone()[0]
     submissions = db.execute("SELECT * FROM Submission").fetchall()
 
     if request.method == 'POST':
@@ -137,4 +146,7 @@ def feedback():
         if error is not None:
             flash(error)
 
-    return render_template('run/feedback.html', submissions=submissions, full_mark=full_mark)
+    return render_template('run/feedback.html',
+                           submissions=submissions,
+                           full_mark=session['full_mark'],
+                           plagiarisms=session['plagiarism'])
