@@ -12,7 +12,7 @@
 {% block content %}
     <form method="post">
         <div class="form-header">
-            <label>Feedback report overview</label>
+            <label>Feedback report</label>
         </div>
         <div class="table">
             <table>
@@ -34,10 +34,35 @@
             </tbody>
             </table>
         </div>
-        <div class="spacer"></div>
-        <div class="divider"></div>
         <div class="form-footer" id="centered-div">
             <input type="submit" value="View feedback reports">
         </div>
+        <div class="divider"></div>
+        <div class="form-header">
+            <label>Plagiarism report</label>
+        </div>
+        <div class="table">
+            <table>
+            <thead>
+            <tr>
+                <th><label>Submission 1</label></th>
+                <th><label>Submission 2</label></th>
+                <th><label>Percentage</label></th>
+                <th><label>Lines Matched</label></th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for plagiarism in plagiarisms %}
+                <tr>
+                    <td><label>{{ plagiarism['sm_1'] }}</label></td>
+                    <td><label>{{ plagiarism['sm_2'] }}</label></td>
+                    <td><label>{{ plagiarism['percentage'] }}</label></td>
+                    <td><label>{{ plagiarism['line_match'] }}</label></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+        <div class="spacer"></div>
     </form>
 {% endblock %}
