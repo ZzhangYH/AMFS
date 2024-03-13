@@ -128,5 +128,5 @@ dmypy.json
 *.class
 
 # Generated directories
-tests/*/**/feedback
+tests/*/**/feedback.md
 tests/*/**/plagiarism.html

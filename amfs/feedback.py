@@ -80,7 +80,6 @@ class FeedbackReport:
             'name': self.name,
             'full_mark': f"{self.full_mark:.1f}"
         }
-        os.makedirs(self.submission_dir / "feedback", exist_ok=True)
 
         for submission in self.submissions:
             print(f"Rendering report for submission {submission.id}")
@@ -101,7 +100,8 @@ class FeedbackReport:
             with open(self.template_dir / "feedback.md", 'r') as f:
                 template = Template(f.read(), trim_blocks=True)
                 content = template.render(report=report, submission=sm_dict)
-            with open(self.submission_dir / "feedback" / (submission.id + ".md"), 'w') as f:
+
+            with open(self.submission_dir / submission.id / "feedback.md", 'w') as f:
                 f.write(content)
 
     def run(self):
