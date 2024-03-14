@@ -59,7 +59,7 @@ def marking():
         db.commit()
 
         # Full mark of the marking job
-        session['full_mark'] = db.execute("SELECT SUM(tc_mark) FROM TestCase").fetchone()[0]
+        full_mark = db.execute("SELECT SUM(tc_mark) FROM TestCase").fetchone()[0]
 
         # List of all submissions
         submissions: list[Submission] = []
@@ -101,7 +101,7 @@ def marking():
         # Feedback instance
         fr = FeedbackReport(
             name=session['job'],
-            full_mark=session['full_mark'],
+            full_mark=full_mark,
             template_dir=current_app.name + "/" + current_app.template_folder,
             submission_dir=session['submission_dir'],
             submissions=submissions,
@@ -109,7 +109,7 @@ def marking():
             feedbacks=feedbacks,
             feedback_selection=feedback_selection
         )
-        fr.run()
+        session['result'] = fr.run()
 
         # Plagiarism instance
         pd = PlagDetection(
@@ -119,16 +119,13 @@ def marking():
         )
         session['plagiarism'] = pd.run()
 
-        return redirect(url_for('run.feedback'))
+        return redirect(url_for('run.results'))
 
     return render_template('run/marking.html', overview=overview)
 
 
-@bp.route('/feedback', methods=['GET', 'POST'])
-def feedback():
-    db = get_db()
-    submissions = db.execute("SELECT * FROM Submission").fetchall()
-
+@bp.route('/results', methods=['GET', 'POST'])
+def results():
     if request.method == 'POST':
         system = platform.system()
         path = Path(session['submission_dir']) / "feedback"
@@ -146,7 +143,6 @@ def feedback():
         if error is not None:
             flash(error)
 
-    return render_template('run/feedback.html',
-                           submissions=submissions,
-                           full_mark=session['full_mark'],
-                           plagiarisms=session['plagiarism'])
+    return render_template('run/results.html',
+                           result=session['result'],
+                           plagiarism=session['plagiarism'])

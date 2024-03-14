@@ -39,15 +39,25 @@ class FeedbackReport:
         self.feedbacks = feedbacks
         self.feedback_selection = feedback_selection
 
+        # Setting up for result stats
+        self.sm_mark_sum = 0.0
+        self.tc_stats = [{
+            'name': f"{tc.name}",
+            'mark': tc.mark,
+            'pass_count': 0
+        } for tc in tests]
+
         for submission in self.submissions:
+            self.sm_mark_sum += submission.mark
             submission.mark = round(submission.mark, 1)
             submission.failed_tests = set()
             submission.passed_tests = set()
             for attempt in submission.attempts:
-                if attempt.code != 0:
-                    submission.failed_tests.add(attempt.tc_id)
-                else:
+                if attempt.code == 0:
+                    self.tc_stats[attempt.tc_id]['pass_count'] += 1
                     submission.passed_tests.add(attempt.tc_id)
+                else:
+                    submission.failed_tests.add(attempt.tc_id)
 
             print(f"Submission {submission.id}: fail: {submission.failed_tests}, pass: {submission.passed_tests}")
 
@@ -104,9 +114,32 @@ class FeedbackReport:
             with open(self.submission_dir / submission.id / "feedback.md", 'w') as f:
                 f.write(content)
 
-    def run(self):
+    def statistics(self) -> dict:
+        sm_count = len(self.submissions)
+        full_mark = f"{self.full_mark:.2f}"
+        avg_mark = f"{self.sm_mark_sum / self.full_mark:.2f}"
+        for tc in self.tc_stats:
+            tc['full_mark'] = f"{tc['mark']:.2f}"
+            tc['avg_mark'] = f"{tc['mark'] * tc['pass_count'] / sm_count:.2f}"
+            tc['pass_rate'] = f"{tc['pass_count'] / sm_count:.0%}"
+
+        print("Result statistics:")
+        print("> sm_count:", sm_count)
+        print("> full_mark:", full_mark)
+        print("> avg_mark:", avg_mark)
+        print("> tc_stats:", self.tc_stats)
+
+        return {
+            'sm_count': sm_count,
+            'avg_mark': avg_mark,
+            'full_mark': full_mark,
+            'tc_stats': self.tc_stats
+        }
+
+    def run(self) -> dict:
         self.generate_feedback()
         self.render_report()
+        return self.statistics()
 
 
 def overridden_tests(tests: frozenset[int]) -> set[frozenset[int]]:
@@ -167,23 +200,23 @@ def main():
         Submission(id="02",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="00", tc_id=0, code=2, mark=0, output="Compile success."),
-                       Attempt(sm_id="00", tc_id=1, code=2, mark=0, output="10\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)"),
-                       Attempt(sm_id="00", tc_id=2, code=2, mark=0, output="8\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)")
+                       Attempt(sm_id="02", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="02", tc_id=1, code=2, mark=0, output="10\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)"),
+                       Attempt(sm_id="02", tc_id=2, code=2, mark=0, output="8\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)")
                    ]),
         Submission(id="03",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="00", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="00", tc_id=1, code=0, mark=0, output="10\n\nTimeout expired."),
-                       Attempt(sm_id="00", tc_id=2, code=0, mark=0, output="8\n\nTimeout expired.")
+                       Attempt(sm_id="03", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="03", tc_id=1, code=3, mark=0, output="10\n\nTimeout expired."),
+                       Attempt(sm_id="03", tc_id=2, code=3, mark=0, output="8\n\nTimeout expired.")
                    ]),
         Submission(id="04",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="00", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="00", tc_id=1, code=0, mark=0, output="20\n"),
-                       Attempt(sm_id="00", tc_id=2, code=0, mark=0, output="16\n")
+                       Attempt(sm_id="04", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="04", tc_id=1, code=4, mark=0, output="20\n"),
+                       Attempt(sm_id="04", tc_id=2, code=4, mark=0, output="16\n")
                    ]),
     ]
 

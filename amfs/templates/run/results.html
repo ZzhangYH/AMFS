@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Results{% endblock %}
+{% block header %}{{ session['job'] }}{% endblock %}
+
+{% block status %}
+    <div>
+        <img src="{{ url_for('static', filename='svg/status-bar-5.svg') }}" alt="Status Bar">
+    </div>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <div class="symbol-label">
+            <img src="{{ url_for('static', filename='svg/symbol-checkmark.rectangle.stack.svg') }}"
+                 alt="Checkmark stack symbol for marking configurations">
+            <label>
+                Individual feedback reports have been generated in corresponding submission folder
+            </label>
+            <label hidden="hidden"></label>
+        </div>
+        <div class="form-header">
+            <label>Marking statistics</label>
+        </div>
+        <div class="info">
+            <label>Total submissions: {{ result['sm_count'] }}</label>
+            <label>Average mark: {{ result['avg_mark'] }}/{{ result['full_mark'] }}</label>
+            <label>Student performance in each marking test case: </label>
+        </div>
+        <div class="table">
+            <table>
+            <thead>
+            <tr>
+                <th><label>Test case</label></th>
+                <th><label>Average mark</label></th>
+                <th><label>Pass rate</label></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for tc in result['tc_stats'] %}
+                <tr>
+                    <td><label>{{ loop.index0 }}. {{ tc['name'] }}</label></td>
+                    <td><label>
+                        {% if loop.index0 == 0 %}
+                            N/A
+                        {% else %}
+                            {{ tc['avg_mark'] }}/{{ tc['full_mark'] }}
+                        {% endif %}
+                    </label></td>
+                    <td><label>
+                        {{ tc['pass_count'] }}/{{ result['sm_count'] }} ({{ tc['pass_rate'] }})
+                    </label></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
+        <div class="form-header">
+            <label>Suspected plagiarism</label>
+        </div>
+        <div class="table">
+            <table>
+            <thead>
+            <tr>
+                <th><label>Target 1</label></th>
+                <th><label>Target 2</label></th>
+                <th><label>Similarity</label></th>
+                <th><label>Lines Matched</label></th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for plag in plagiarism %}
+                <tr>
+                    <td><label>{{ plag['sm_1'] }}</label></td>
+                    <td><label>{{ plag['sm_2'] }}</label></td>
+                    <td><label>{{ plag['percentage'] }}</label></td>
+                    <td><label>{{ plag['line_match'] }}</label></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            </table>
+        </div>
+        <div class="spacer"></div>
+        <div class="divider"></div>
+        <div class="form-footer" id="centered-div">
+            <input type="submit" value="Download results">
+        </div>
+    </form>
+{% endblock %}
