@@ -1,0 +1,70 @@
+:root {
+    --accent: #0071E3;
+    --primary: #4A4A4A;
+    --secondary: #CCCCCC;
+    --tertiary: #F1F1F1;
+    --error: #E30000;
+    --normal-radius: 6px;
+}
+
+html {
+    font-family: SF Pro Text,SF Pro Icons,Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 2rem;
+}
+
+strong {
+    color: var(--primary)
+}
+
+a {
+    text-decoration:none
+}
+
+.divider {
+    border-bottom: 1px solid var(--secondary);
+    margin: 0.5rem 0 0.5rem 0;
+}
+
+.tc {
+    border: 1px solid var(--secondary);
+    border-radius: var(--normal-radius);
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.tc h4 {
+    background-color: var(--tertiary);
+    border-bottom: 1px solid var(--secondary);;
+    padding: 0.75rem 1rem 0.75rem 1rem;
+    margin: 0;
+}
+
+.pass {
+    color: var(--accent);
+}
+
+.fail {
+    color: var(--error);
+}
+
+.tc p {
+    font-size: smaller;
+    padding: 0;
+    margin: 0.75rem 1rem 0.5rem 1rem;
+}
+
+.tc pre {
+    font-size: smaller;
+    border-left: 2px solid var(--primary);
+    padding: 0 1rem 0 1rem;
+    margin: 0.5rem 1rem 0.75rem 1rem;
+}
+
+@page {
+    size: A4;
+    margin: 1rem
+}

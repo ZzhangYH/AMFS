@@ -99,7 +99,8 @@ def marking():
         fr = FeedbackReport(
             name=session['job'],
             full_mark=full_mark,
-            template_dir=current_app.name + "/" + current_app.template_folder,
+            template_file=f"{current_app.name}/{current_app.template_folder}/feedback.html",
+            css_file=f"{current_app.static_folder}/feedback.css",
             submission_dir=session['submission_dir'],
             submissions=submissions,
             tests=tests,

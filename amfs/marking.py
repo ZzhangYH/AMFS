@@ -27,7 +27,7 @@ class TestCase:
 class Attempt:
     sm_id: str
     tc_id: int
-    code: int   # 0: PASS, 1: COMPILE_ERROR, 2: RUNTIME_ERROR, 3: TIMEOUT, 4: INCORRECT_OUTPUT
+    code: int   # 0: PASS, 1: COMPILE_ERROR, 2: RUN_ERROR, 3: TIME_LIMIT, 4: WRONG_ANSWER
     mark: float
     output: str
 

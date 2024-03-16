@@ -301,7 +301,7 @@ input[type=checkbox]:checked:after {
 }
 
 @media print {
-    section { max-width: 80% }
+    section { max-width: 85% }
     .content { margin-top: 1rem }
     .form-header { margin-bottom: 0 }
     .status { display: none }

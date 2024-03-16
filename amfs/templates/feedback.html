@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Feedback</title>
+</head>
+<body>
+    <h1>{{ report['name'] }} - Feedback</h1>
+
+    <p>
+        <strong>Submission ID:</strong> {{ submission['id'] }}<br>
+        <strong>Overall mark:</strong> {{ submission['mark'] }}/{{ report['full_mark'] }}
+    </p>
+
+    <div class="divider"></div>
+
+    {% if submission['failed_tests']|length > 0 %}
+        <p><strong>Failed tests:</strong></p>
+        <p>
+            {% for link in submission['failed_tests'] %}
+                {{ link }}<br>
+            {% endfor %}
+        </p>
+    {% endif %}
+
+    {% if submission['passed_tests']|length > 0 %}
+        <p><strong>Passed tests:</strong></p>
+        <p>
+            {% for link in submission['passed_tests'] %}
+                {{ link }}<br>
+            {% endfor %}
+        </p>
+    {% endif %}
+
+    <div class="divider"></div>
+
+    {% if submission['feedback']|length > 0 %}
+        <h3>Instructor Feedback</h3>
+        <ul>
+        {% for feedback in submission['feedback'] %}
+            <li>{{ feedback }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h3>Test Case Breakdown</h3>
+
+    {% for attempt in submission['attempts'] %}
+        <div class="tc">
+            {{ attempt['name'] }}
+            <p><strong><em>{{ attempt['code'] }}</em></strong></p>
+            <pre>{{ attempt['output'] }}</pre>
+        </div>
+    {% endfor %}
+</body>
+</html>
