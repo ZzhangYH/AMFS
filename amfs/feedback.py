@@ -4,6 +4,7 @@ from itertools import combinations
 from pathlib import Path
 
 from jinja2 import Template
+from weasyprint import HTML, CSS
 
 from amfs.marking import TestCase, Attempt
 
@@ -23,7 +24,8 @@ class FeedbackReport:
             self,
             name: str,
             full_mark: float,
-            template_dir: str,
+            template_file: str,
+            css_file: str,
             submission_dir: str,
             submissions: [Submission],
             tests: [TestCase],
@@ -32,24 +34,68 @@ class FeedbackReport:
     ):
         self.name = name
         self.full_mark = full_mark
-        self.template_dir = Path(template_dir)
+        self.template_file = Path(template_file)
+        self.css_file = Path(css_file)
         self.submission_dir = Path(submission_dir)
         self.submissions = submissions
         self.tests = tests
         self.feedbacks = feedbacks
         self.feedback_selection = feedback_selection
 
+        # Setting up for result stats
+        self.sm_mark_sum = 0.0
+        self.tc_stats = [{
+            'name': f"{tc.name}",
+            'mark': tc.mark,
+            'pass_count': 0
+        } for tc in tests]
+
         for submission in self.submissions:
+            self.sm_mark_sum += submission.mark
             submission.mark = round(submission.mark, 1)
             submission.failed_tests = set()
             submission.passed_tests = set()
             for attempt in submission.attempts:
-                if attempt.code != 0:
-                    submission.failed_tests.add(attempt.tc_id)
-                else:
+                if attempt.code == 0:
+                    self.tc_stats[attempt.tc_id]['pass_count'] += 1
                     submission.passed_tests.add(attempt.tc_id)
+                else:
+                    submission.failed_tests.add(attempt.tc_id)
 
             print(f"Submission {submission.id}: fail: {submission.failed_tests}, pass: {submission.passed_tests}")
+
+    @staticmethod
+    def overridden_tests(tests: frozenset[int]) -> set[frozenset[int]]:
+        result = set()
+        for r in range(1, len(tests)):
+            for combination in combinations(tests, r):
+                result.add(frozenset(combination))
+
+        return result
+
+    @staticmethod
+    def render_code(code: int) -> str:
+        match code:
+            case 0:
+                return "PASS"
+            case 1:
+                return "COMPILE_ERROR"
+            case 2:
+                return "RUN_ERROR"
+            case 3:
+                return "TIME_LIMIT"
+            case 4:
+                return "WRONG_ANSWER"
+
+    @staticmethod
+    def html_tc(test: TestCase, fail: bool, tag: str) -> str:
+        content = test.name + f" ({0.0 if fail else test.mark:.1f}/{test.mark:.1f})"
+        state = "fail" if fail else "pass"
+
+        if tag == "h4":
+            return f'<h4 id="{content}" class="{state}">{content}</h4>'
+        elif tag == "a":
+            return f'<a href="#{content}" class="{state}">{content}</a>'
 
     def generate_feedback(self) -> None:
         for submission in self.submissions:
@@ -66,7 +112,7 @@ class FeedbackReport:
                 if combination <= submission.failed_tests:
                     temp.add(combination)
                     if len(combination) > 1:
-                        discarded |= overridden_tests(combination)
+                        discarded |= FeedbackReport.overridden_tests(combination)
 
             feedback = [self.feedback_selection.index(tests) for tests in temp - discarded]
             print(f"> temp: {temp}")
@@ -80,7 +126,6 @@ class FeedbackReport:
             'name': self.name,
             'full_mark': f"{self.full_mark:.1f}"
         }
-        os.makedirs(self.submission_dir / "feedback", exist_ok=True)
 
         for submission in self.submissions:
             print(f"Rendering report for submission {submission.id}")
@@ -88,66 +133,55 @@ class FeedbackReport:
             sm_dict = {
                 'id': submission.id,
                 'mark': f"{submission.mark:.1f}",
-                'failed_tests': [md_link(self.tests[i], True) for i in submission.failed_tests],
-                'passed_tests': [md_link(self.tests[i], False) for i in submission.passed_tests],
+                'failed_tests': [FeedbackReport.html_tc(self.tests[i], True, "a")
+                                 for i in submission.failed_tests],
+                'passed_tests': [FeedbackReport.html_tc(self.tests[i], False, "a")
+                                 for i in submission.passed_tests],
                 'feedback': submission.feedback,
                 'attempts': [{
-                    'name': md_heading(self.tests[attempt.tc_id], attempt.code != 0),
-                    'code': render_code(attempt.code),
+                    'name': FeedbackReport.html_tc(self.tests[attempt.tc_id],
+                                                   attempt.code != 0,
+                                                   "h4"),
+                    'code': FeedbackReport.render_code(attempt.code),
                     'output': attempt.output
                 } for attempt in submission.attempts]
             }
 
-            with open(self.template_dir / "feedback.md", 'r') as f:
-                template = Template(f.read(), trim_blocks=True)
+            with open(self.template_file, 'r') as f:
+                template = Template(f.read())
                 content = template.render(report=report, submission=sm_dict)
-            with open(self.submission_dir / "feedback" / (submission.id + ".md"), 'w') as f:
-                f.write(content)
 
-    def run(self):
+            HTML(string=content).write_pdf(
+                target=self.submission_dir / submission.id / "feedback.pdf",
+                stylesheets=[CSS(filename=self.css_file)]
+            )
+
+    def statistics(self) -> dict:
+        sm_count = len(self.submissions)
+        full_mark = f"{self.full_mark:.2f}"
+        avg_mark = f"{self.sm_mark_sum / self.full_mark:.2f}"
+        for tc in self.tc_stats:
+            tc['full_mark'] = f"{tc['mark']:.2f}"
+            tc['avg_mark'] = f"{tc['mark'] * tc['pass_count'] / sm_count:.2f}"
+            tc['pass_rate'] = f"{tc['pass_count'] / sm_count:.0%}"
+
+        print("Result statistics:")
+        print("> sm_count:", sm_count)
+        print("> full_mark:", full_mark)
+        print("> avg_mark:", avg_mark)
+        print("> tc_stats:", self.tc_stats)
+
+        return {
+            'sm_count': sm_count,
+            'avg_mark': avg_mark,
+            'full_mark': full_mark,
+            'tc_stats': self.tc_stats
+        }
+
+    def run(self) -> dict:
         self.generate_feedback()
         self.render_report()
-
-
-def overridden_tests(tests: frozenset[int]) -> set[frozenset[int]]:
-    result = set()
-    for r in range(1, len(tests)):
-        for combination in combinations(tests, r):
-            result.add(frozenset(combination))
-
-    return result
-
-
-def md_heading(test: TestCase, fail: bool) -> str:
-    return test.name + f" ({0.0 if fail else test.mark:.1f}/{test.mark:.1f})"
-
-
-def md_link(test: TestCase, fail: bool) -> str:
-    result = "[" + md_heading(test, fail) + "](#"
-    for c in md_heading(test, fail):
-        if c.isalnum():
-            result += c.lower()
-        elif c == "-" or c == "_":
-            result += c
-        elif c == " ":
-            result += "-"
-
-    result += ")"
-    return result
-
-
-def render_code(code: int) -> str:
-    match code:
-        case 0:
-            return "PASS"
-        case 1:
-            return "COMPILE_ERROR"
-        case 2:
-            return "RUNTIME_ERROR"
-        case 3:
-            return "TIMEOUT"
-        case 4:
-            return "INCORRECT_OUTPUT"
+        return self.statistics()
 
 
 def main():
@@ -167,23 +201,23 @@ def main():
         Submission(id="02",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="00", tc_id=0, code=2, mark=0, output="Compile success."),
-                       Attempt(sm_id="00", tc_id=1, code=2, mark=0, output="10\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)"),
-                       Attempt(sm_id="00", tc_id=2, code=2, mark=0, output="8\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)")
+                       Attempt(sm_id="02", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="02", tc_id=1, code=2, mark=0, output="10\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)"),
+                       Attempt(sm_id="02", tc_id=2, code=2, mark=0, output="8\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)")
                    ]),
         Submission(id="03",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="00", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="00", tc_id=1, code=0, mark=0, output="10\n\nTimeout expired."),
-                       Attempt(sm_id="00", tc_id=2, code=0, mark=0, output="8\n\nTimeout expired.")
+                       Attempt(sm_id="03", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="03", tc_id=1, code=3, mark=0, output="10\n\nTimeout expired."),
+                       Attempt(sm_id="03", tc_id=2, code=3, mark=0, output="8\n\nTimeout expired.")
                    ]),
         Submission(id="04",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="00", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="00", tc_id=1, code=0, mark=0, output="20\n"),
-                       Attempt(sm_id="00", tc_id=2, code=0, mark=0, output="16\n")
+                       Attempt(sm_id="04", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="04", tc_id=1, code=4, mark=0, output="20\n"),
+                       Attempt(sm_id="04", tc_id=2, code=4, mark=0, output="16\n")
                    ]),
     ]
 
@@ -194,12 +228,14 @@ def main():
     ]
 
     feedbacks = [
+        "Test cases not run due to failure of compilation.",
         "This is feedback 1",
         "This is feedback 2",
         "This is combinatorial feedback 1, 2"
     ]
 
     feedback_selection = [
+        frozenset({0}),
         frozenset({1}),
         frozenset({2}),
         frozenset({1, 2})
@@ -208,7 +244,8 @@ def main():
     fr = FeedbackReport(
         name="Sample",
         full_mark=3,
-        template_dir="templates",
+        template_file="templates/feedback.html",
+        css_file="static/feedback.css",
         submission_dir=os.path.join(os.getcwd(), "../tests/marking/submission"),
         submissions=submissions,
         tests=tests,
