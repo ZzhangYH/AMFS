@@ -1,10 +1,7 @@
-import os
-import platform
-from pathlib import Path
-
 from flask import (
-    Blueprint, redirect, render_template, request, session, url_for, current_app, flash
+    Blueprint, redirect, render_template, request, session, url_for, current_app
 )
+from flask_weasyprint import render_pdf
 
 from amfs.database.db import get_db
 from amfs.feedback import Submission, FeedbackReport
@@ -127,21 +124,8 @@ def marking():
 @bp.route('/results', methods=['GET', 'POST'])
 def results():
     if request.method == 'POST':
-        system = platform.system()
-        path = Path(session['submission_dir']) / "feedback"
-        error = None
-
-        if system == 'Windows':
-            os.system(f'explorer "{path}"')
-        elif system == 'Darwin':  # macOS
-            os.system(f'open "{path}"')
-        elif system == 'Linux':
-            os.system(f'xdg-open "{path}"')
-        else:
-            error = "Unsupported operating system."
-
-        if error is not None:
-            flash(error)
+        return render_pdf(html=url_for('run.results'),
+                          download_filename=f"{session['job']} results.pdf")
 
     return render_template('run/results.html',
                            result=session['result'],

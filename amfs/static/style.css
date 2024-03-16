@@ -294,3 +294,18 @@ input[type=checkbox]:checked:after {
     font-weight: normal;
     display: flex;
 }
+
+@page {
+    size: A4;
+    margin: 0
+}
+
+@media print {
+    section { max-width: 80% }
+    .content { margin-top: 1rem }
+    .form-header { margin-bottom: 0 }
+    .status { display: none }
+    .divider { display: none }
+    .symbol-label { display: none }
+    input[type=submit] { display: none }
+}
