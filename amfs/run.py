@@ -83,8 +83,8 @@ def marking():
         tests.insert(0, TestCase(id=0, name="Compilation", mark=0))
 
         # List of all feedbacks with corresponding test case selection
-        feedback_selection: [frozenset[int]] = []
-        feedbacks: list[str] = []
+        feedback_selection: [frozenset[int]] = [frozenset({0})]
+        feedbacks: list[str] = ["Test cases not run due to failure of compilation."]
         for fb_row in db.execute("SELECT * FROM Feedback ORDER BY fb_id ASC").fetchall():
             tc_combination: [int] = []
             for fs_row in db.execute("SELECT tc_id FROM FeedbackSelection WHERE fb_id = ?",
