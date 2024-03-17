@@ -159,7 +159,7 @@ class FeedbackReport:
     def statistics(self) -> dict:
         sm_count = len(self.submissions)
         full_mark = f"{self.full_mark:.2f}"
-        avg_mark = f"{self.sm_mark_sum / self.full_mark:.2f}"
+        avg_mark = f"{self.sm_mark_sum / sm_count:.2f}"
         for tc in self.tc_stats:
             tc['full_mark'] = f"{tc['mark']:.2f}"
             tc['avg_mark'] = f"{tc['mark'] * tc['pass_count'] / sm_count:.2f}"
