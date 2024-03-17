@@ -5,17 +5,17 @@ from pathlib import Path
 
 
 @dataclass
-class MarkingConfig:
-    name: str
-    compile: str
-    execute: str
-    timeout: int
-    solution_dir: Path
-    submission_dir: Path
-
-
-@dataclass
 class TestCase:
+    """
+    Test case configurations.
+
+    Attributes:
+        id: ID of this test case
+        name: Name of this test case
+        mark: Full mark of this test case
+        input: stdin for this test case
+        solution: Sample stdout for this test case
+    """
     id: int
     name: str
     mark: float
@@ -25,6 +25,17 @@ class TestCase:
 
 @dataclass
 class Attempt:
+    """
+    Record of an attempt running a submission against a test case.
+
+    Attributes:
+        sm_id: Submission ID in this attempt
+        tc_id: Test case ID in this attempt
+        code: Indicates the result for this attempt:
+              0 (PASS), 1 (COMPILE_ERROR), 2 (RUN_ERROR), 3 (TIME_LIMIT), 4 (WRONG_ANSWER)
+        mark: Actual mark in this attempt
+        output: stdout captured in this attempt, with stderr if applicable
+    """
     sm_id: str
     tc_id: int
     code: int   # 0: PASS, 1: COMPILE_ERROR, 2: RUN_ERROR, 3: TIME_LIMIT, 4: WRONG_ANSWER
@@ -33,6 +44,17 @@ class Attempt:
 
 
 class AutoMarking:
+    """
+    Automated marking module.
+
+    Attributes:
+        compile_command: Compilation command for marking
+        execute_command: Execution command for marking
+        timeout: Timeout limit
+        tests: List of all test cases
+        solution_dir: Directory containing the sample solution
+        submission_dir: Directory containing subdirectories of student submissions
+    """
     def __init__(
             self,
             compile_command: str,
@@ -42,6 +64,17 @@ class AutoMarking:
             solution_dir: str,
             submission_dir: str,
     ):
+        """
+        Initiates a new automated marking job.
+
+        Args:
+            compile_command: Compilation command for marking
+            execute_command: Execution command for marking
+            timeout: Timeout limit
+            tests: List of all test cases
+            solution_dir: Directory containing the sample solution
+            submission_dir: Directory containing subdirectories of student submissions
+        """
         self.compile_command = compile_command
         self.execute_command = execute_command
         self.timeout = timeout
@@ -58,6 +91,18 @@ class AutoMarking:
             solution_dir: str,
             submission_dir: str
     ) -> str | None:
+        """
+        Checks if the configurations submitted is valid for marking.
+
+        Args:
+            compile_command: Compilation command for marking
+            timeout: Timeout limit
+            solution_dir: Directory containing the sample solution
+            submission_dir: Directory containing subdirectories of student submissions
+
+        Returns:
+            An error message explaining invalid config, otherwise None
+        """
         try:
             if int(timeout) <= 0:
                 return "Timeout should be greater than 0."
@@ -82,7 +127,13 @@ class AutoMarking:
 
         return None
 
-    def get_solutions(self) -> str | None:
+    def _get_solutions(self) -> str | None:
+        """
+        Generating sample solutions for all test cases.
+
+        Returns:
+            An error message, otherwise None
+        """
         try:
             subprocess.run(self.compile_command, shell=True, cwd=self.solution_dir)
         except subprocess.CalledProcessError:
@@ -106,7 +157,16 @@ class AutoMarking:
         print("Sample solutions generated.")
         return None
 
-    def compile_submission(self, submission: str) -> Attempt:
+    def _compile_submission(self, submission: str) -> Attempt:
+        """
+        Compiling a specific submission.
+
+        Args:
+            submission: Submission ID
+
+        Returns:
+            An Attempt object as the result of the compilation
+        """
         try:
             subprocess.run(
                 self.compile_command,
@@ -130,7 +190,17 @@ class AutoMarking:
             output="Compile success." if error is None else "Compile failed.\n" + error
         )
 
-    def execute_submission(self, submission: str, test: TestCase) -> Attempt:
+    def _execute_submission(self, submission: str, test: TestCase) -> Attempt:
+        """
+        Executing a specific submission against a specific test case.
+
+        Args:
+            submission: Submission ID
+            test: Test case object
+
+        Returns:
+            An Attempt object as the result of the execution
+        """
         print(f"> Running test case {test.id}.")
         try:
             result = subprocess.run(
@@ -161,15 +231,24 @@ class AutoMarking:
         )
 
     def run(self) -> [Attempt]:
-        self.get_solutions()
+        """
+        Runs the automated marking module:
+        1. Getting sample solutions;
+        2. Running all submissions against compilation and test cases;
+        The submission will not be executed if compilation fails.
+
+        Returns:
+            A list of attempts while marking
+        """
+        self._get_solutions()
         attempts = []
         for submission in self.submissions:
             print(f"Marking student submission: [{submission}].")
-            compile_attempt = self.compile_submission(submission)
+            compile_attempt = self._compile_submission(submission)
             attempts.append(compile_attempt)
             if compile_attempt.code == 0:
                 for test in self.tests:
-                    attempts.append(self.execute_submission(submission, test))
+                    attempts.append(self._execute_submission(submission, test))
 
         return attempts
 

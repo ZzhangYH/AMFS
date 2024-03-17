@@ -11,6 +11,16 @@ from amfs.marking import TestCase, Attempt
 
 @dataclass
 class Submission:
+    """
+    Record of a submission information.
+
+    Attributes:
+        id: ID of this submission
+        mark: Actual mark of this submission
+        attempts: A list of all marking attempts of this submission
+        failed_tests: A set of test case IDs failed by this submission
+        passed_tests: A set of test case IDs passed by this submission
+    """
     id: str
     mark: float
     attempts: [Attempt]
@@ -19,7 +29,22 @@ class Submission:
     feedback: [str] = field(default_factory=list)
 
 
+# noinspection GrazieInspection
 class FeedbackReport:
+    """
+    Feedback generation module.
+
+    Attributes:
+        name: Nome of the marking job
+        full_mark: Full mark of the marking job
+        template_file: Path string to the html template file
+        css_file: Path string to the css file for the template
+        submission_dir: Directory containing subdirectories of student submissions
+        submissions: A list of all submission objects
+        tests: A list of all test case objects
+        feedbacks: A list of all feedback strings
+        feedback selection: A list of sets containing test case IDs corresponding to each feedback
+    """
     def __init__(
             self,
             name: str,
@@ -32,6 +57,21 @@ class FeedbackReport:
             feedbacks: [str],
             feedback_selection: [frozenset[int]]
     ):
+        """
+        Initiates a new feedback generation job.
+
+        Args:
+            name: Nome of the marking job
+            full_mark: Full mark of the marking job
+            template_file: Path string to the html template file
+            css_file: Path string to the css file for the template
+            submission_dir: Directory containing subdirectories of student submissions
+            submissions: A list of all submission objects
+            tests: A list of all test case objects
+            feedbacks: A list of all feedback strings
+            feedback selection: A list of sets containing test case IDs
+             corresponding to each feedback
+        """
         self.name = name
         self.full_mark = full_mark
         self.template_file = Path(template_file)
@@ -66,6 +106,16 @@ class FeedbackReport:
 
     @staticmethod
     def overridden_tests(tests: frozenset[int]) -> set[frozenset[int]]:
+        """
+        Calculates all possible combinations of test case IDs in the given set.
+        This is used for discarding certain feedbacks already covered by combinatorial ones.
+
+        Args:
+            tests: A set of test case IDs
+
+        Returns:
+            A set of calculated set combinations
+        """
         result = set()
         for r in range(1, len(tests)):
             for combination in combinations(tests, r):
@@ -75,6 +125,15 @@ class FeedbackReport:
 
     @staticmethod
     def render_code(code: int) -> str:
+        """
+        Renders the marking result code to corresponding written indicators in feedback reports.
+
+        Args:
+            code: Integer code in the attempt object
+
+        Returns:
+            A written indicator for the attempt result
+        """
         match code:
             case 0:
                 return "PASS"
@@ -89,6 +148,17 @@ class FeedbackReport:
 
     @staticmethod
     def html_tc(test: TestCase, fail: bool, tag: str) -> str:
+        """
+        Generates HTML code blocks for the specified test case.
+
+        Args:
+            test: Test case object
+            fail: Whether it is failed or not
+            tag: HTML tag (<h4> or <a>)
+
+        Returns:
+            HTML code blocks to be render in feedback reports
+        """
         content = test.name + f" ({0.0 if fail else test.mark:.1f}/{test.mark:.1f})"
         state = "fail" if fail else "pass"
 
@@ -97,7 +167,15 @@ class FeedbackReport:
         elif tag == "a":
             return f'<a href="#{content}" class="{state}">{content}</a>'
 
-    def generate_feedback(self) -> None:
+    def _generate_feedback(self) -> None:
+        """
+        Generates feedback for all submissions. The process include comparing failed test cases
+        of a submission with feedback selections, resulting in a list of feedback messages
+        written into the submission object.
+
+        Returns:
+            None
+        """
         for submission in self.submissions:
             print(f"Generating feedback for submission {submission.id}")
 
@@ -121,7 +199,14 @@ class FeedbackReport:
             print(f"> feedback: {feedback}")
             submission.feedback = [self.feedbacks[i] for i in feedback]
 
-    def render_report(self) -> None:
+    def _render_report(self) -> None:
+        """
+        Renders feedback reports for all submissions and saves them directly into each corresponding
+        submission directories.
+
+        Returns:
+            None
+        """
         report = {
             'name': self.name,
             'full_mark': f"{self.full_mark:.1f}"
@@ -156,7 +241,13 @@ class FeedbackReport:
                 stylesheets=[CSS(filename=self.css_file)]
             )
 
-    def statistics(self) -> dict:
+    def _statistics(self) -> dict:
+        """
+        Summarizes the marking results, providing statistics for the users.
+
+        Returns:
+            A dictionary of the results data.
+        """
         sm_count = len(self.submissions)
         full_mark = f"{self.full_mark:.2f}"
         avg_mark = f"{self.sm_mark_sum / sm_count:.2f}"
@@ -179,9 +270,15 @@ class FeedbackReport:
         }
 
     def run(self) -> dict:
-        self.generate_feedback()
-        self.render_report()
-        return self.statistics()
+        """
+        Generates feedback, render and writes feedback reports.
+
+        Returns:
+            The marking result statistics
+        """
+        self._generate_feedback()
+        self._render_report()
+        return self._statistics()
 
 
 def main():

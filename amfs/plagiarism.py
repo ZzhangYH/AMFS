@@ -8,22 +8,38 @@ from bs4 import BeautifulSoup
 
 # MOSS registered user id
 # https://theory.stanford.edu/~aiken/moss/
-userid = 569350584
+USER_ID = 569350584
 
 
 class PlagDetection:
+    """
+    Plagiarism detection module.
+
+    Attributes:
+        language: Programming language for detection
+        submission_dir: Directory containing subdirectories of student submissions
+        ignore_limit: Maximum number of times a given passage may appear before it is ignored
+    """
     def __init__(
             self,
             language: str,
             submission_dir: str,
             ignore_limit: int
     ):
+        """
+        Initiates a new plagiarism detection job.
+
+        Args:
+            language: Programming language for detection
+            submission_dir: Directory containing subdirectories of student submissions
+            ignore_limit: Maximum number of times a given passage may appear before it is ignored
+        """
         self.language = language
         self.submission_dir = submission_dir
         self.ignore_limit = ignore_limit
 
         # Set up MOSS config
-        self.moss = mosspy.Moss(userid, self.language)
+        self.moss = mosspy.Moss(USER_ID, self.language)
         self.moss.setIgnoreLimit(self.ignore_limit)
         self.moss.setDirectoryMode(1)
         self.moss.addFilesByWildcard(os.path.join(self.submission_dir,
@@ -31,12 +47,31 @@ class PlagDetection:
 
     @staticmethod
     def wildcard_ext(language: str) -> str:
+        """
+        Generates a wildcard file extensions of the specified programming language.
+        For example: java -> "\*/\*.java"
+
+        Args:
+            language: Programming language for detection
+
+        Returns:
+            A matching pattern for wildcard file extensions
+        """
         match language:
             case "java":
                 return "*/*.java"
 
     @staticmethod
     def extract_plag(row) -> dict[str, str]:
+        """
+        Extracts detailed plagiarism information from the specified HTML tr row.
+
+        Args:
+            row: HTML tr row from MOSS report url
+
+        Returns:
+            A dictionary containing the extracted plagiarism information
+        """
         file_1, file_2, line_match = None, None, None
 
         for index, cell in enumerate(row.find_all('td')):
@@ -54,6 +89,13 @@ class PlagDetection:
         }
 
     def run(self) -> dict:
+        """
+        Sends all detecting files to MOSS server, retrieves the report url, and extracts the
+        information within.
+
+        Returns:
+            A dictionary containing the extracted plagiarism information
+        """
         print(f"Detecting plagiarism over directory {self.submission_dir}")
         url = None
 
