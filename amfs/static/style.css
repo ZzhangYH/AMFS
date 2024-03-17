@@ -108,6 +108,14 @@ label {
     margin-bottom: 0.5rem;
 }
 
+a {
+    color: var(--accent)
+}
+
+p {
+    text-align: center;
+}
+
 .table {
     border: 1px solid var(--secondary);
     border-radius: var(--input-radius);
@@ -302,8 +310,8 @@ input[type=checkbox]:checked:after {
 
 @media print {
     section { max-width: 85% }
-    .content { margin-top: 1rem }
     .form-header { margin-bottom: 0 }
+    .table { margin-bottom: 0 }
     .status { display: none }
     .divider { display: none }
     .symbol-label { display: none }

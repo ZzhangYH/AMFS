@@ -1,4 +1,6 @@
 import os
+from datetime import date, timedelta
+from urllib.error import HTTPError
 from urllib.request import urlopen
 
 import mosspy
@@ -52,7 +54,7 @@ class PlagDetection:
             'line_match': line_match.rstrip('\n')
         }
 
-    def run(self) -> [dict[str, str]]:
+    def run(self) -> dict:
         print(f"Detecting plagiarism over directory {self.submission_dir}")
         url = None
 
@@ -62,19 +64,30 @@ class PlagDetection:
             url = self.moss.send(lambda file_path, display_name: print('#', end='', flush=True))
             print("\n> MOSS Report Url: " + url)
 
+        plagiarism: dict = {
+            'extract': None,
+            'url': url,
+            'date': (date.today() + timedelta(days=13)).strftime("%b %d, %Y"),
+            'pg_list': []
+        }
+
         # Load contents from the url
-        response = urlopen(url)
-        charset = response.headers.get_content_charset()
-        content = response.read().decode(charset)
-        print("\n> Contents loaded from url, soap doing the work...")
+        try:
+            response = urlopen(url)
+            charset = response.headers.get_content_charset()
+            content = response.read().decode(charset)
+            print("> Contents loaded from url, extracting plag details.")
+            plagiarism['extract'] = True
 
-        # Extract plagiarism rows
-        soup = BeautifulSoup(content, 'lxml')
-        plag_list: [dict[str, str]] = []
-        for tr in soup.table.find_all('tr')[1:]:
-            plag_list.append(PlagDetection.extract_plag(tr))
+            # Extract plagiarism rows
+            soup = BeautifulSoup(content, 'lxml')
+            for tr in soup.table.find_all('tr')[1:]:
+                plagiarism['pg_list'].append(PlagDetection.extract_plag(tr))
 
-        return plag_list
+        except HTTPError:
+            print("> Failed to load contents from url.")
+
+        return plagiarism
 
 
 def main():
@@ -84,7 +97,12 @@ def main():
         ignore_limit=100
     )
 
-    for row in pd.run():
+    plagiarism = pd.run()
+    print(plagiarism['extract'])
+    print(plagiarism['url'])
+    print(plagiarism['date'])
+
+    for row in plagiarism['pg_list']:
         print(row)
 
 
