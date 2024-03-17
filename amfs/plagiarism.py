@@ -48,9 +48,8 @@ class PlagDetection:
                 line_match = cell.get_text()
 
         return {
-            'sm_1': file_1.split(' ')[0].split('/')[-2],
-            'sm_2': file_2.split(' ')[0].split('/')[-2],
-            'percentage': file_2.split(' ')[1].split('(')[1].split(')')[0],
+            'sm_1': file_1.split(' ')[0].split('/')[-2] + ' ' + file_1.split(' ')[1],
+            'sm_2': file_2.split(' ')[0].split('/')[-2] + ' ' + file_2.split(' ')[1],
             'line_match': line_match.rstrip('\n')
         }
 
