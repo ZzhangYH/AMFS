@@ -316,4 +316,8 @@ input[type=checkbox]:checked:after {
     .divider { display: none }
     .symbol-label { display: none }
     input[type=submit] { display: none }
+    .form-header label { font-size: medium }
+    .info label { font-size: small }
+    th label { font-size: small }
+    td label { font-size: small }
 }

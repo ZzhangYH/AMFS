@@ -1,4 +1,3 @@
-import os
 import tempfile
 from pathlib import Path
 
@@ -70,7 +69,7 @@ def test_case_design():
                     db.execute("""
                         INSERT INTO TestCase (tc_id, tc_name, tc_mark, tc_input)
                         VALUES (?, ?, ?, ?)
-                    """, (i, os.path.splitext(os.path.basename(filename))[0], mark, f.read()))
+                    """, (i, filename, mark, f.read()))
                     # Insert feedback entries
                     db.execute("INSERT INTO Feedback (fb_id, fb_content) VALUES (?, ?)",
                                (i, feedback))
