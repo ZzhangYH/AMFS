@@ -1,6 +1,6 @@
 import os
 from datetime import date, timedelta
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 
 import mosspy
@@ -106,6 +106,7 @@ class PlagDetection:
             print("\n> MOSS Report Url: " + url)
 
         plagiarism: dict = {
+            'response': None,
             'extract': None,
             'url': url,
             'date': (date.today() + timedelta(days=13)).strftime("%b %d, %Y"),
@@ -115,10 +116,11 @@ class PlagDetection:
         # Load contents from the url
         try:
             response = urlopen(url)
+            plagiarism['response'] = True
+            plagiarism['extract'] = True
             charset = response.headers.get_content_charset()
             content = response.read().decode(charset)
             print("> Contents loaded from url, extracting plag details.")
-            plagiarism['extract'] = True
 
             # Extract plagiarism rows
             soup = BeautifulSoup(content, 'lxml')
@@ -126,7 +128,11 @@ class PlagDetection:
                 plagiarism['pg_list'].append(PlagDetection.extract_plag(tr))
 
         except HTTPError:
+            plagiarism['response'] = True
             print("> Failed to load contents from url.")
+
+        except (URLError, ValueError):
+            print("> Url error.")
 
         return plagiarism
 
@@ -139,9 +145,10 @@ def main():
     )
 
     plagiarism = pd.run()
-    print(plagiarism['extract'])
-    print(plagiarism['url'])
-    print(plagiarism['date'])
+    print("Response:", plagiarism['response'])
+    print("Extract:", plagiarism['extract'])
+    print("Url:", plagiarism['url'])
+    print("Date:", plagiarism['date'])
 
     for row in plagiarism['pg_list']:
         print(row)
