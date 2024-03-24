@@ -13,9 +13,6 @@ bp = Blueprint('setup', __name__, url_prefix='/setup')
 
 @bp.route('/basics', methods=['GET', 'POST'])
 def basics():
-    if session.get('job') is None:
-        return redirect(url_for('index'))
-
     if request.method == 'POST':
         compile_command = request.form['cCommand']
         execute_command = request.form['eCommand']
@@ -40,9 +37,6 @@ def basics():
 
 @bp.route('/test-case-design', methods=['GET', 'POST'])
 def test_case_design():
-    if session.get('job') is None:
-        return redirect(url_for('index'))
-
     tests = None
     temp_file_dir = Path(tempfile.gettempdir())
 
@@ -86,9 +80,6 @@ def test_case_design():
 
 @bp.route('/additional-settings', methods=['GET', 'POST'])
 def additional_settings():
-    if session.get('job') is None:
-        return redirect(url_for('index'))
-
     db = get_db()
     tests = db.execute("SELECT * FROM TestCase").fetchall()
 
