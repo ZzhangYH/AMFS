@@ -103,29 +103,41 @@ class AutoMarking:
         Returns:
             An error message explaining invalid config, otherwise None
         """
+        error: [str] = []
+
         try:
             if int(timeout) <= 0:
-                return "Timeout should be greater than 0."
+                error.append("Timeout should be greater than 0.")
         except ValueError:
-            return "Timeout should be an integer."
+            error.append("Timeout should be an integer.")
 
         solution_dir = Path(solution_dir)
         submission_dir = Path(submission_dir)
         if not solution_dir.is_dir():
-            return f"No such directory {solution_dir}."
+            error.append(f"No such directory {solution_dir}.")
         if not submission_dir.is_dir():
-            return f"No such directory {submission_dir}."
+            error.append(f"No such directory {submission_dir}.")
 
-        try:
-            subprocess.run(compile_command, shell=True, cwd=solution_dir)
-        except subprocess.CalledProcessError:
-            return "Failed to compile solution."
+        if solution_dir.is_dir():
+            try:
+                result = subprocess.run(compile_command,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.STDOUT,
+                                        shell=True,
+                                        cwd=solution_dir)
+                if result.stdout:
+                    if "error" in result.stdout.decode() or "error" in result.stdout.decode():
+                        error.append("Failed to compile solution.")
 
-        submissions = [d for d in os.listdir(submission_dir) if os.path.isdir(submission_dir / d)]
-        if not submissions or len(submissions) == 0:
-            return "No submission found."
+            except subprocess.CalledProcessError:
+                error.append("Failed to compile solution.")
 
-        return None
+        if submission_dir.is_dir():
+            submissions = [d for d in os.listdir(submission_dir) if os.path.isdir(submission_dir / d)]
+            if not submissions or len(submissions) == 0:
+                error.append("No submission found.")
+
+        return error if len(error) > 0 else None
 
     def _get_solutions(self) -> str | None:
         """

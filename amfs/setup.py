@@ -30,7 +30,8 @@ def basics():
             session['submission_dir'] = submission_dir
             return redirect(url_for('setup.test_case_design'))
 
-        flash(error)
+        for e in error:
+            flash(e)
 
     return render_template('setup/basics.html')
 
