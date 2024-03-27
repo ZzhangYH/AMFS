@@ -283,38 +283,38 @@ class FeedbackReport:
 
 def main():
     submissions = [
-        Submission(id="00",
+        Submission(id="Submission_00",
                    mark=3,
                    attempts=[
-                       Attempt(sm_id="00", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="00", tc_id=1, code=0, mark=1, output="10\n"),
-                       Attempt(sm_id="00", tc_id=2, code=0, mark=2, output="8\n")
+                       Attempt(sm_id="Submission_00", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="Submission_00", tc_id=1, code=0, mark=1, output="10\n"),
+                       Attempt(sm_id="Submission_00", tc_id=2, code=0, mark=2, output="8\n")
                    ]),
-        Submission(id="01",
+        Submission(id="Submission_01",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="01", tc_id=0, code=1, mark=0, output="Compile failed.\nerror: file not found: IdSum.java\nUsage: javac <options> <source files>\nuse --help for a list of possible options")
+                       Attempt(sm_id="Submission_01", tc_id=0, code=1, mark=0, output="Compile failed.\nerror: file not found: IdSum.java\nUsage: javac <options> <source files>\nuse --help for a list of possible options")
                    ]),
-        Submission(id="02",
+        Submission(id="Submission_02",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="02", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="02", tc_id=1, code=2, mark=0, output="10\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)"),
-                       Attempt(sm_id="02", tc_id=2, code=2, mark=0, output="8\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)")
+                       Attempt(sm_id="Submission_02", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="Submission_02", tc_id=1, code=2, mark=0, output="10\n\nRuntime error.\nException in thread \"main\" java.lang.IndexOutOfBoundsException\n\tat IdSum.main(IdSum.java:58)"),
+                       Attempt(sm_id="Submission_02", tc_id=2, code=0, mark=2, output="8\n")
                    ]),
-        Submission(id="03",
+        Submission(id="Submission_03",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="03", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="03", tc_id=1, code=3, mark=0, output="10\n\nTimeout expired."),
-                       Attempt(sm_id="03", tc_id=2, code=3, mark=0, output="8\n\nTimeout expired.")
+                       Attempt(sm_id="Submission_03", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="Submission_03", tc_id=1, code=0, mark=1, output="10\n"),
+                       Attempt(sm_id="Submission_03", tc_id=2, code=3, mark=0, output="8\n\nTimeout expired.")
                    ]),
-        Submission(id="04",
+        Submission(id="Submission_04",
                    mark=0,
                    attempts=[
-                       Attempt(sm_id="04", tc_id=0, code=0, mark=0, output="Compile success."),
-                       Attempt(sm_id="04", tc_id=1, code=4, mark=0, output="20\n"),
-                       Attempt(sm_id="04", tc_id=2, code=4, mark=0, output="16\n")
+                       Attempt(sm_id="Submission_04", tc_id=0, code=0, mark=0, output="Compile success."),
+                       Attempt(sm_id="Submission_04", tc_id=1, code=4, mark=0, output="20\n"),
+                       Attempt(sm_id="Submission_04", tc_id=2, code=4, mark=0, output="16\n")
                    ]),
     ]
 
@@ -343,7 +343,7 @@ def main():
         full_mark=3,
         template_file="templates/feedback.html",
         css_file="static/feedback.css",
-        submission_dir=os.path.join(os.getcwd(), "../tests/marking/submission"),
+        submission_dir=os.path.join(os.getcwd(), "../tests/Module/marking-feedback/submission"),
         submissions=submissions,
         tests=tests,
         feedbacks=feedbacks,

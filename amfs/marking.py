@@ -267,14 +267,14 @@ class AutoMarking:
 
 # Test the marking process is working
 def main():
-    with open(Path(os.getcwd()) / "../tests/marking/test_case/1.in") as f1:
+    with open(Path(os.getcwd()) / "../tests/Module/marking-feedback/test_case/test_case_1.in") as f1:
         test1 = TestCase(
             id=1,
             name="test1",
             mark=1,
             input=f1.read()
         )
-    with open(Path(os.getcwd()) / "../tests/marking/test_case/2.in") as f2:
+    with open(Path(os.getcwd()) / "../tests/Module/marking-feedback/test_case/test_case_2.in") as f2:
         test2 = TestCase(
             id=2,
             name="test2",
@@ -286,8 +286,8 @@ def main():
         execute_command="java -Dfile.encoding=UTF-8 -XX:+UseSerialGC -Xss64m -Xms1920m -Xmx1920m IdSum",
         timeout=1,
         tests=[test1, test2],
-        solution_dir=os.path.join(os.getcwd(), "../tests/marking/solution"),
-        submission_dir=os.path.join(os.getcwd(), "../tests/marking/submission")
+        solution_dir=os.path.join(os.getcwd(), "../tests/Module/marking-feedback/solution"),
+        submission_dir=os.path.join(os.getcwd(), "../tests/Module/marking-feedback/submission")
     )
     attempts = marking.run()
 

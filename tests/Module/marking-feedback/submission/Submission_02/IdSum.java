@@ -55,7 +55,9 @@ public class IdSum {
         scanner.close();
 
         System.out.println(sumEven());
-        while (true);
+        if (sumEven() == 10) {
+            throw new IndexOutOfBoundsException();
+        }
     }
 
 }
