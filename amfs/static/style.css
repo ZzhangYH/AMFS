@@ -320,4 +320,5 @@ input[type=checkbox]:checked:after {
     .info label { font-size: small }
     th label { font-size: small }
     td label { font-size: small }
+    #plag { display: none }
 }
