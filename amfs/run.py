@@ -1,3 +1,5 @@
+import time
+
 from flask import (
     Blueprint, redirect, render_template, request, session, url_for, current_app
 )
@@ -19,6 +21,8 @@ def marking():
     overview['fb_count'] = db.execute("SELECT COUNT(fb_id) FROM Feedback").fetchone()[0]
 
     if request.method == 'POST':
+        start_time = time.time()
+
         # List of all test cases
         tests: list[TestCase] = []
         for tc_row in db.execute("SELECT * FROM TestCase ORDER BY tc_id ASC").fetchall():
@@ -116,6 +120,8 @@ def marking():
             ignore_limit=200
         )
         session['plagiarism'] = pd.run()
+
+        print("--- %s seconds ---" % (time.time() - start_time))
 
         return redirect(url_for('run.results'))
 
