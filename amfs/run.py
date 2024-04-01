@@ -1,3 +1,10 @@
+"""
+Copyright (C) 2024 Yuhan Zhang - All Rights Reserved
+
+This file is part of AMFS, which is distributed under the terms of the GPLv3 License.
+See the file LICENSE at the top level directory of this distribution for details.
+"""
+
 import time
 
 from flask import (
