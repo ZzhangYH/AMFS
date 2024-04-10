@@ -129,4 +129,4 @@ dmypy.json
 
 # Generated feedback files
 test/*/**/feedback.pdf
-tests/
+tests/*/**/feedback.pdf
