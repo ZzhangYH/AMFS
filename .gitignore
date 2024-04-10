@@ -128,5 +128,5 @@ dmypy.json
 *.class
 
 # Generated feedback files
-tests/*/**/feedback.pdf
-test/
+test/*/**/feedback.pdf
+tests/
