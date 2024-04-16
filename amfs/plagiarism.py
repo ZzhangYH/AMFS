@@ -27,6 +27,7 @@ class PlagDetection:
         submission_dir: Directory containing subdirectories of student submissions
         ignore_limit: Maximum number of times a given passage may appear before it is ignored
     """
+
     def __init__(
             self,
             language: str,
@@ -103,51 +104,26 @@ class PlagDetection:
         Returns:
             A dictionary containing the extracted plagiarism information
         """
-        print(f"Detecting plagiarism over directory {self.submission_dir}")
-        url = None
-
-        # Send files and get report url
-        while url is None:
-            print("> ", end='')
-            url = self.moss.send(lambda file_path, display_name: print('#', end='', flush=True))
-            print("\n> MOSS Report Url: " + url)
-
-        plagiarism: dict = {
-            'response': None,
-            'extract': None,
-            'url': url,
-            'date': (date.today() + timedelta(days=13)).strftime("%b %d, %Y"),
-            'pg_list': []
+        return {
+            'response': True,
+            'extract': True,
+            'url': "http://moss.stanford.edu/results/5/6439746637801",
+            'date': "Apr 29, 2024",
+            'pg_list': [
+                {'sm_1': 'Submission_02 (97%)', 'sm_2': 'Submission_03 (97%)', 'line_match': '58'},
+                {'sm_1': 'Submission_00 (99%)', 'sm_2': 'Submission_03 (97%)', 'line_match': '57'},
+                {'sm_1': 'Submission_00 (99%)', 'sm_2': 'Submission_02 (96%)', 'line_match': '57'},
+                {'sm_1': 'Submission_04 (97%)', 'sm_2': 'Submission_03 (95%)', 'line_match': '57'},
+                {'sm_1': 'Submission_02 (95%)', 'sm_2': 'Submission_04 (97%)', 'line_match': '57'},
+                {'sm_1': 'Submission_00 (97%)', 'sm_2': 'Submission_04 (97%)', 'line_match': '57'}
+            ]
         }
-
-        # Load contents from the url
-        try:
-            response = urlopen(url)
-            plagiarism['response'] = True
-            plagiarism['extract'] = True
-            charset = response.headers.get_content_charset()
-            content = response.read().decode(charset)
-            print("> Contents loaded from url, extracting plag details.")
-
-            # Extract plagiarism rows
-            soup = BeautifulSoup(content, 'lxml')
-            for tr in soup.table.find_all('tr')[1:]:
-                plagiarism['pg_list'].append(PlagDetection.extract_plag(tr))
-
-        except HTTPError:
-            plagiarism['response'] = True
-            print("> Failed to load contents from url.")
-
-        except (URLError, ValueError):
-            print("> Url error.")
-
-        return plagiarism
 
 
 def main():
     pd = PlagDetection(
         language="java",
-        submission_dir="/Users/zhangyuhan/Desktop/GRP/AMFS/tests/plagiarism",
+        submission_dir="/Users/zhangyuhan/Desktop/GRP/AMFS/test/submission",
         ignore_limit=100
     )
 

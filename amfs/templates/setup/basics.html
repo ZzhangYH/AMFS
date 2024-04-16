@@ -19,21 +19,22 @@
 {% block content %}
     <form method="post">
         <label for="cCommand">Compilation</label>
-        <input type="text" name="cCommand" id="cCommand" value="{{ request.form['cCommand'] }}"
-               placeholder="Compile command" required>
+        <input type="text" name="cCommand" id="cCommand" placeholder="Compile command"
+               value="javac -encoding UTF-8 -sourcepath . IdSum.java" required>
         <label for="eCommand">Execution</label>
-        <input type="text" name="eCommand" id="eCommand" value="{{ request.form['eCommand'] }}"
-               placeholder="Execute command" required>
+        <input type="text" name="eCommand" id="eCommand" placeholder="Execute command"
+               value="java -Dfile.encoding=UTF-8 -XX:+UseSerialGC -Xss64m -Xms1920m -Xmx1920m IdSum"
+               required>
         <label for="timeout">Time constraints (in seconds)</label>
-        <input type="text" name="timeout" id="timeout" value="{{ request.form['timeout'] }}"
-               placeholder="Timeout" required>
+        <input type="text" name="timeout" id="timeout" placeholder="Timeout"
+               value="1" required>
         <label for="solutionDir">Path to solution</label>
         <input type="text" name="solutionDir" id="solutionDir"
-               value="{{ request.form['solutionDir'] }}"
+               value="./test/solution"
                placeholder="Absolute path to the directory of model solution" required>
         <label for="submissionDir">Path to student submissions</label>
         <input type="text" name="submissionDir" id="submissionDir"
-               value="{{ request.form['submissionDir'] }}"
+               value="./test/submission"
                placeholder="Absolute path to the directory of all student submissions" required>
         <div class="spacer"></div>
         <div class="divider"></div>
